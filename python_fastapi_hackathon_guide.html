@@ -1,0 +1,1181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python + FastAPI — Hackathon Reference Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:       #0b0e14;
+    --surface:  #12161f;
+    --card:     #181d28;
+    --border:   #252d3d;
+    --accent:   #3b82f6;
+    --accent2:  #22d3a0;
+    --accent3:  #f59e0b;
+    --accent4:  #a78bfa;
+    --red:      #ef4444;
+    --text:     #e2e8f0;
+    --muted:    #64748b;
+    --code-bg:  #0d1117;
+    --node:     #68a063;
+    --python:   #3b82f6;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: linear-gradient(135deg, #0f1623 0%, #0b0e14 60%);
+    border-bottom: 1px solid var(--border);
+    padding: 48px 48px 36px;
+    position: relative;
+    overflow: hidden;
+  }
+  header::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse 60% 80% at 80% 50%, rgba(59,130,246,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .header-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--accent2);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  header h1 {
+    font-size: clamp(28px, 4vw, 48px);
+    font-weight: 800;
+    line-height: 1.1;
+    color: #fff;
+  }
+  header h1 span { color: var(--accent); }
+  .header-sub {
+    margin-top: 12px;
+    color: var(--muted);
+    font-size: 15px;
+    max-width: 600px;
+  }
+  .topic-pills {
+    display: flex; flex-wrap: wrap; gap: 8px;
+    margin-top: 24px;
+  }
+  .pill {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    border: 1px solid;
+    letter-spacing: .5px;
+  }
+  .pill-blue  { color: var(--accent);  border-color: rgba(59,130,246,.3);  background: rgba(59,130,246,.08); }
+  .pill-green { color: var(--accent2); border-color: rgba(34,211,160,.3);  background: rgba(34,211,160,.08); }
+  .pill-amber { color: var(--accent3); border-color: rgba(245,158,11,.3);  background: rgba(245,158,11,.08); }
+  .pill-purple{ color: var(--accent4); border-color: rgba(167,139,250,.3); background: rgba(167,139,250,.08); }
+  .pill-red   { color: var(--red);     border-color: rgba(239,68,68,.3);   background: rgba(239,68,68,.08); }
+
+  /* ── LAYOUT ── */
+  main { max-width: 1100px; margin: 0 auto; padding: 48px 32px 80px; }
+
+  /* ── SECTION ── */
+  .section {
+    margin-bottom: 64px;
+    animation: fadeUp .5s ease both;
+  }
+  .section:nth-child(2) { animation-delay: .05s; }
+  .section:nth-child(3) { animation-delay: .10s; }
+  .section:nth-child(4) { animation-delay: .15s; }
+  .section:nth-child(5) { animation-delay: .20s; }
+  @keyframes fadeUp {
+    from { opacity:0; transform:translateY(18px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+
+  .section-header {
+    display: flex; align-items: flex-start; gap: 16px;
+    margin-bottom: 24px;
+  }
+  .section-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--bg);
+    background: var(--accent);
+    border-radius: 6px;
+    padding: 4px 10px;
+    white-space: nowrap;
+    margin-top: 4px;
+  }
+  .section-num.green  { background: var(--accent2); }
+  .section-num.amber  { background: var(--accent3); }
+  .section-num.purple { background: var(--accent4); }
+  .section-num.red    { background: var(--red); }
+
+  .section-title {
+    font-size: 22px;
+    font-weight: 800;
+    color: #fff;
+    line-height: 1.3;
+  }
+  .section-desc {
+    font-size: 14px;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+
+  /* ── CARD ── */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+  .card-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .card-label .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+  }
+  .dot-blue   { background: var(--accent); }
+  .dot-green  { background: var(--accent2); }
+  .dot-amber  { background: var(--accent3); }
+  .dot-purple { background: var(--accent4); }
+  .dot-red    { background: var(--red); }
+  .dot-node   { background: var(--node); }
+
+  /* ── CODE ── */
+  pre {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    line-height: 1.7;
+    padding: 20px 20px;
+    overflow-x: auto;
+    background: var(--code-bg);
+  }
+  code { font-family: 'JetBrains Mono', monospace; font-size: 13px; }
+
+  /* syntax tokens */
+  .kw   { color: #ff79c6; }
+  .fn   { color: #50fa7b; }
+  .str  { color: #f1fa8c; }
+  .cm   { color: #6272a4; font-style: italic; }
+  .num  { color: #bd93f9; }
+  .cls  { color: #8be9fd; }
+  .dec  { color: #ff79c6; }
+  .op   { color: #ff79c6; }
+  .var  { color: #f8f8f2; }
+  .imp  { color: #ff79c6; }
+
+  /* ── SIDE-BY-SIDE ── */
+  .side-by-side {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  @media(max-width:700px){ .side-by-side { grid-template-columns:1fr; } }
+
+  /* ── INFO BOX ── */
+  .info-box {
+    background: rgba(59,130,246,.07);
+    border: 1px solid rgba(59,130,246,.25);
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .info-box.green {
+    background: rgba(34,211,160,.07);
+    border-color: rgba(34,211,160,.25);
+  }
+  .info-box.amber {
+    background: rgba(245,158,11,.07);
+    border-color: rgba(245,158,11,.25);
+  }
+  .info-box-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+  .info-box-body {}
+  .info-box-body strong { color: #fff; display: block; margin-bottom: 4px; font-size: 14px; }
+  .info-box-body p { color: var(--muted); line-height: 1.5; }
+
+  /* ── STEP LIST ── */
+  .steps { display: flex; flex-direction: column; gap: 12px; }
+  .step {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 18px;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+  }
+  .step-n {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--accent);
+    background: rgba(59,130,246,.12);
+    border: 1px solid rgba(59,130,246,.25);
+    border-radius: 6px;
+    padding: 3px 8px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .step-body {}
+  .step-body strong { color: #fff; display: block; font-size: 14px; margin-bottom: 3px; }
+  .step-body p { color: var(--muted); font-size: 13px; line-height: 1.5; }
+  .step-body code {
+    background: rgba(255,255,255,.06);
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+    color: var(--accent2);
+  }
+
+  /* ── COMPARISON TABLE ── */
+  .compare-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .compare-table th {
+    padding: 10px 14px;
+    text-align: left;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--border);
+  }
+  .compare-table th:first-child { color: var(--node); }
+  .compare-table th:last-child  { color: var(--python); }
+  .compare-table td {
+    padding: 8px 14px;
+    border-bottom: 1px solid rgba(255,255,255,.04);
+    vertical-align: top;
+    line-height: 1.5;
+  }
+  .compare-table tr:last-child td { border-bottom: none; }
+  .compare-table td:first-child { color: #a8d8a1; }
+  .compare-table td:last-child  { color: #93c5fd; }
+
+  /* ── DIVIDER ── */
+  .divider {
+    border: none;
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--border), transparent);
+    margin: 48px 0;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    text-align: center;
+    color: var(--muted);
+    font-size: 12px;
+    font-family: 'JetBrains Mono', monospace;
+    padding: 32px;
+    border-top: 1px solid var(--border);
+    letter-spacing: .5px;
+  }
+  footer strong { color: var(--accent2); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-tag">// Agentic AI Hackathon · May 2026 · Python + FastAPI</div>
+  <h1>Python <span>&amp;</span> FastAPI<br>Reference Guide</h1>
+  <p class="header-sub">A-to-Z working code for every concept you need — from environment setup to class design. Sourced directly from official Python and FastAPI documentation.</p>
+  <div class="topic-pills">
+    <span class="pill pill-blue">01 — Virtual Environment</span>
+    <span class="pill pill-green">02 — Express → FastAPI Migration</span>
+    <span class="pill pill-amber">03 — Parallel API Calls</span>
+    <span class="pill pill-purple">04 — python-dotenv</span>
+    <span class="pill pill-red">05 — Python Classes</span>
+  </div>
+</header>
+
+<main>
+
+  <!-- ══════════════════════════════════════════════════════
+       TOPIC 01 — VIRTUAL ENVIRONMENT
+  ══════════════════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">01</span>
+      <div>
+        <div class="section-title">Install Python 3.11+ &amp; Set Up a Virtual Environment</div>
+        <div class="section-desc">The first thing you do at every hackathon. Isolates your packages. Never skip this.</div>
+      </div>
+    </div>
+
+    <div class="info-box">
+      <span class="info-box-icon">💡</span>
+      <div class="info-box-body">
+        <strong>Why a virtual environment?</strong>
+        <p>A venv creates an isolated Python runtime. Your hackathon dependencies (fastapi, anthropic, streamlit…) install inside it without touching system Python. Every team member gets the same locked versions.</p>
+      </div>
+    </div>
+
+    <div class="steps">
+      <div class="step">
+        <span class="step-n">STEP 1</span>
+        <div class="step-body">
+          <strong>Check your Python version</strong>
+          <p>You need 3.11 or higher. FastAPI's async performance and modern type hint features require it.</p>
+        </div>
+      </div>
+      <div class="step">
+        <span class="step-n">STEP 2</span>
+        <div class="step-body">
+          <strong>Create the virtual environment</strong>
+          <p>Run <code>python -m venv env</code> in your project root. This creates an <code>env/</code> folder containing a self-contained Python interpreter.</p>
+        </div>
+      </div>
+      <div class="step">
+        <span class="step-n">STEP 3</span>
+        <div class="step-body">
+          <strong>Activate it</strong>
+          <p>On Mac/Linux: <code>source env/bin/activate</code> — On Windows: <code>env\Scripts\activate</code>. Your terminal prefix changes to <code>(env)</code>.</p>
+        </div>
+      </div>
+      <div class="step">
+        <span class="step-n">STEP 4</span>
+        <div class="step-body">
+          <strong>Install your hackathon stack</strong>
+          <p>Paste the one-liner from your master plan. Every package goes into <code>env/</code>, not system Python.</p>
+        </div>
+      </div>
+      <div class="step">
+        <span class="step-n">STEP 5</span>
+        <div class="step-body">
+          <strong>Freeze your requirements</strong>
+          <p>Run <code>pip freeze &gt; requirements.txt</code> so teammates can reproduce the exact environment with <code>pip install -r requirements.txt</code>.</p>
+        </div>
+      </div>
+    </div>
+
+    <br>
+    <div class="card">
+      <div class="card-label"><span class="dot dot-blue"></span>TERMINAL — full setup sequence</div>
+      <pre><span class="cm"># 1. Confirm Python version (must be 3.11+)</span>
+python3 --version
+
+<span class="cm"># 2. Create virtual environment in current folder</span>
+python3 <span class="op">-m</span> venv env
+
+<span class="cm"># 3. Activate (Mac / Linux)</span>
+<span class="kw">source</span> env/bin/activate
+
+<span class="cm"># 3b. Activate (Windows PowerShell)</span>
+env\Scripts\Activate.ps1
+
+<span class="cm"># 4. Install the full hackathon stack (from your Master Plan)</span>
+pip install anthropic streamlit requests httpx beautifulsoup4 \
+    pandas plotly pymupdf reportlab chromadb sentence-transformers \
+    langgraph python-dotenv apscheduler twilio sendgrid folium \
+    streamlit-folium fastapi uvicorn
+
+<span class="cm"># 5. Lock versions for teammates</span>
+pip freeze <span class="op">&gt;</span> requirements.txt
+
+<span class="cm"># Teammate setup (after cloning repo):</span>
+<span class="kw">source</span> env/bin/activate
+pip install <span class="op">-r</span> requirements.txt
+
+<span class="cm"># Deactivate when done</span>
+deactivate</pre>
+    </div>
+
+    <div class="info-box green">
+      <span class="info-box-icon">✅</span>
+      <div class="info-box-body">
+        <strong>Confirm it worked</strong>
+        <p>Run <code>which python</code> — the path should point inside your <code>env/</code> folder, not <code>/usr/bin/python</code>. If it does, you're isolated and ready.</p>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ══════════════════════════════════════════════════════
+       TOPIC 02 — EXPRESS → FASTAPI MIGRATION
+  ══════════════════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num green">02</span>
+      <div>
+        <div class="section-title">Rewrite a Node.js Express Route in FastAPI</div>
+        <div class="section-desc">Side-by-side comparison. The mental model is nearly identical — the syntax is different.</div>
+      </div>
+    </div>
+
+    <div class="info-box">
+      <span class="info-box-icon">🔄</span>
+      <div class="info-box-body">
+        <strong>The mental model maps 1-to-1</strong>
+        <p>Express and FastAPI share the same decorator-based routing concept. <code>app.get('/route', handler)</code> in Express becomes <code>@app.get('/route')</code> above a function in FastAPI. The biggest difference: FastAPI uses Python type hints to automatically validate request data and generate Swagger docs.</p>
+      </div>
+    </div>
+
+    <!-- Concept comparison table -->
+    <div class="card">
+      <div class="card-label"><span class="dot dot-green"></span>CONCEPT MAP — Express vs FastAPI</div>
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th>Node.js / Express</th>
+            <th>Python / FastAPI</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>const express = require('express')</td><td>from fastapi import FastAPI</td></tr>
+          <tr><td>const app = express()</td><td>app = FastAPI()</td></tr>
+          <tr><td>app.get('/path', handler)</td><td>@app.get('/path')</td></tr>
+          <tr><td>app.post('/path', handler)</td><td>@app.post('/path')</td></tr>
+          <tr><td>req.params.id</td><td>id: str  (path parameter)</td></tr>
+          <tr><td>req.query.search</td><td>search: str = Query(...)</td></tr>
+          <tr><td>req.body</td><td>body: MyModel  (Pydantic)</td></tr>
+          <tr><td>res.json({ data })</td><td>return {"data": data}</td></tr>
+          <tr><td>res.status(404).json({err})</td><td>raise HTTPException(status_code=404)</td></tr>
+          <tr><td>app.listen(3000)</td><td>uvicorn main:app --reload</td></tr>
+          <tr><td>express.json() middleware</td><td>Built-in (Pydantic does it)</td></tr>
+          <tr><td>async (req, res) => {}</td><td>async def handler():</td></tr>
+          <tr><td>next(err) for errors</td><td>raise HTTPException(...)</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Side-by-side code -->
+    <p style="color:var(--muted); font-size:13px; margin-bottom:12px;">Example: A route that accepts a shipment query, returns risk data. This mirrors your CargoSense idea.</p>
+    <div class="side-by-side">
+      <div class="card">
+        <div class="card-label" style="color:var(--node);"><span class="dot dot-node"></span>Node.js + Express</div>
+        <pre><span class="cm">// routes/shipment.js</span>
+<span class="kw">const</span> <span class="var">express</span> = require(<span class="str">'express'</span>);
+<span class="kw">const</span> <span class="var">router</span> = express.Router();
+
+<span class="cm">// GET /shipment/:id</span>
+router.get(<span class="str">'/shipment/:id'</span>,
+  <span class="kw">async</span> (<span class="var">req</span>, <span class="var">res</span>) => {
+    <span class="kw">const</span> { <span class="var">id</span> } = req.params;
+    <span class="kw">const</span> { <span class="var">origin</span> } = req.query;
+
+    <span class="kw">if</span> (!<span class="var">id</span>) {
+      <span class="kw">return</span> res.status(<span class="num">400</span>).json({
+        error: <span class="str">'id required'</span>
+      });
+    }
+
+    <span class="kw">const</span> <span class="var">data</span> = <span class="kw">await</span>
+      <span class="fn">getShipmentData</span>(<span class="var">id</span>, <span class="var">origin</span>);
+
+    res.json({
+      shipment_id: <span class="var">id</span>,
+      origin: <span class="var">origin</span>,
+      risk_score: data.risk,
+      route: data.route
+    });
+  }
+);
+
+<span class="cm">// POST /shipment/analyze</span>
+router.post(<span class="str">'/shipment/analyze'</span>,
+  <span class="kw">async</span> (<span class="var">req</span>, <span class="var">res</span>) => {
+    <span class="kw">const</span> { <span class="var">cargo</span>, <span class="var">route</span> } = req.body;
+
+    <span class="kw">const</span> <span class="var">result</span> = <span class="kw">await</span>
+      <span class="fn">analyzeShipment</span>(<span class="var">cargo</span>, <span class="var">route</span>);
+
+    res.status(<span class="num">201</span>).json({ result });
+  }
+);
+
+module.exports = <span class="var">router</span>;</pre>
+      </div>
+      <div class="card">
+        <div class="card-label" style="color:var(--python);"><span class="dot dot-blue"></span>Python + FastAPI</div>
+        <pre><span class="cm"># routes/shipment.py</span>
+<span class="kw">from</span> fastapi <span class="kw">import</span> APIRouter, HTTPException
+<span class="kw">from</span> pydantic <span class="kw">import</span> BaseModel
+<span class="kw">from</span> typing <span class="kw">import</span> Optional
+
+router = APIRouter()
+
+<span class="cm"># GET /shipment/{id}</span>
+<span class="dec">@router.get</span>(<span class="str">"/shipment/{id}"</span>)
+<span class="kw">async def</span> <span class="fn">get_shipment</span>(
+    id: str,
+    origin: Optional[str] = <span class="kw">None</span>
+):
+    <span class="kw">if not</span> id:
+        <span class="kw">raise</span> HTTPException(
+            status_code=<span class="num">400</span>,
+            detail=<span class="str">"id required"</span>
+        )
+
+    data = <span class="kw">await</span> <span class="fn">get_shipment_data</span>(id, origin)
+
+    <span class="kw">return</span> {
+        <span class="str">"shipment_id"</span>: id,
+        <span class="str">"origin"</span>: origin,
+        <span class="str">"risk_score"</span>: data.risk,
+        <span class="str">"route"</span>: data.route
+    }
+
+
+<span class="cm"># Request body model — replaces req.body</span>
+<span class="kw">class</span> <span class="cls">AnalyzeRequest</span>(BaseModel):
+    cargo: str
+    route: str
+
+<span class="cm"># POST /shipment/analyze</span>
+<span class="dec">@router.post</span>(<span class="str">"/shipment/analyze"</span>,
+             status_code=<span class="num">201</span>)
+<span class="kw">async def</span> <span class="fn">analyze_shipment</span>(
+    body: <span class="cls">AnalyzeRequest</span>  <span class="cm"># auto-parsed</span>
+):
+    result = <span class="kw">await</span> <span class="fn">analyze_shipment</span>(
+        body.cargo, body.route
+    )
+    <span class="kw">return</span> {<span class="str">"result"</span>: result}</pre>
+      </div>
+    </div>
+
+    <br>
+    <div class="card">
+      <div class="card-label"><span class="dot dot-green"></span>main.py — wiring the router + running the server</div>
+      <pre><span class="kw">from</span> fastapi <span class="kw">import</span> FastAPI
+<span class="kw">from</span> routes.shipment <span class="kw">import</span> router <span class="kw">as</span> shipment_router
+
+app = FastAPI(title=<span class="str">"CargoSense API"</span>)
+
+<span class="cm"># Mount the router (like express.use)</span>
+app.include_router(shipment_router, prefix=<span class="str">"/api"</span>)
+
+<span class="cm"># Auto-generated docs: http://localhost:8000/docs</span>
+<span class="cm"># Run: uvicorn main:app --reload</span></pre>
+    </div>
+
+    <div class="info-box green">
+      <span class="info-box-icon">🎁</span>
+      <div class="info-box-body">
+        <strong>FastAPI bonus you don't get in Express</strong>
+        <p>Visit <code>http://localhost:8000/docs</code> after running <code>uvicorn main:app --reload</code>. FastAPI auto-generates interactive Swagger UI from your type hints — no extra code, no Postman needed. This alone saves hours at a hackathon.</p>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ══════════════════════════════════════════════════════
+       TOPIC 03 — PARALLEL API CALLS WITH asyncio.gather
+  ══════════════════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num amber">03</span>
+      <div>
+        <div class="section-title">Call Two APIs in Parallel with <code style="font-size:18px">asyncio.gather()</code></div>
+        <div class="section-desc">Fire both requests simultaneously. Cut your wait time in half. Critical for your multi-agent ideas.</div>
+      </div>
+    </div>
+
+    <div class="info-box amber">
+      <span class="info-box-icon">⚡</span>
+      <div class="info-box-body">
+        <strong>Why this matters for your hackathon</strong>
+        <p>Your CargoSense, Supplier Reliability, and News Monitor agents all need to call multiple APIs (news, shipping, FX rates) before they can answer. Calling them sequentially means: API-1 wait + API-2 wait. With <code>asyncio.gather()</code>: just max(API-1, API-2). On a slow venue WiFi this can save 3–5 seconds per query — the difference between an impressive demo and a painfully slow one.</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-label"><span class="dot dot-amber"></span>PATTERN — basic asyncio.gather() with httpx</div>
+      <pre><span class="kw">import</span> asyncio
+<span class="kw">import</span> httpx
+
+<span class="kw">async def</span> <span class="fn">fetch_news</span>(query: str) -> dict:
+    <span class="cm">"""Calls NewsAPI — async, non-blocking."""</span>
+    <span class="kw">async with</span> httpx.AsyncClient() <span class="kw">as</span> client:
+        response = <span class="kw">await</span> client.get(
+            <span class="str">"https://newsapi.org/v2/everything"</span>,
+            params={<span class="str">"q"</span>: query, <span class="str">"apiKey"</span>: <span class="str">"YOUR_KEY"</span>}
+        )
+        <span class="kw">return</span> response.json()
+
+
+<span class="kw">async def</span> <span class="fn">fetch_exchange_rate</span>(currency: str) -> dict:
+    <span class="cm">"""Calls ExchangeRate-API — async, non-blocking."""</span>
+    <span class="kw">async with</span> httpx.AsyncClient() <span class="kw">as</span> client:
+        response = <span class="kw">await</span> client.get(
+            <span class="str">f"https://api.exchangerate-api.com/v4/latest/{currency}"</span>
+        )
+        <span class="kw">return</span> response.json()
+
+
+<span class="kw">async def</span> <span class="fn">get_cargo_intelligence</span>(
+    query: str,
+    currency: str = <span class="str">"USD"</span>
+) -> dict:
+    <span class="cm">"""
+    Fires BOTH calls at the same time.
+    asyncio.gather() waits for all of them,
+    then returns results in the same order.
+    """</span>
+    news_data, fx_data = <span class="kw">await</span> asyncio.gather(
+        <span class="fn">fetch_news</span>(query),
+        <span class="fn">fetch_exchange_rate</span>(currency)
+    )
+
+    <span class="kw">return</span> {
+        <span class="str">"news"</span>: news_data.get(<span class="str">"articles"</span>, []),
+        <span class="str">"pkr_rate"</span>: fx_data.get(<span class="str">"rates"</span>, {}).get(<span class="str">"PKR"</span>)
+    }
+
+
+<span class="cm"># ── Run it (standalone script) ──</span>
+<span class="kw">if</span> __name__ == <span class="str">"__main__"</span>:
+    result = asyncio.run(
+        <span class="fn">get_cargo_intelligence</span>(<span class="str">"Red Sea shipping Pakistan"</span>)
+    )
+    print(result)</pre>
+    </div>
+
+    <div class="card">
+      <div class="card-label"><span class="dot dot-amber"></span>ADVANCED — 3+ APIs in parallel with error handling</div>
+      <pre><span class="kw">import</span> asyncio, httpx
+<span class="kw">from</span> typing <span class="kw">import</span> Any
+
+<span class="kw">async def</span> <span class="fn">safe_fetch</span>(client: httpx.AsyncClient, url: str,
+                      params: dict = <span class="kw">None</span>) -> Any:
+    <span class="cm">"""Wrapper that catches errors so one failed API
+       doesn't crash the others."""</span>
+    <span class="kw">try</span>:
+        r = <span class="kw">await</span> client.get(url, params=params, timeout=<span class="num">8.0</span>)
+        <span class="kw">return</span> r.json()
+    <span class="kw">except</span> Exception <span class="kw">as</span> e:
+        <span class="kw">return</span> {<span class="str">"error"</span>: str(e)}
+
+
+<span class="kw">async def</span> <span class="fn">multi_agent_fetch</span>(cargo_query: str) -> dict:
+    <span class="cm">"""Calls 3 APIs in parallel — news, FX, shipping index."""</span>
+    <span class="kw">async with</span> httpx.AsyncClient() <span class="kw">as</span> client:
+        news, fx, shipping = <span class="kw">await</span> asyncio.gather(
+            <span class="fn">safe_fetch</span>(client,
+                <span class="str">"https://newsapi.org/v2/everything"</span>,
+                {<span class="str">"q"</span>: cargo_query, <span class="str">"apiKey"</span>: <span class="str">"KEY"</span>}
+            ),
+            <span class="fn">safe_fetch</span>(client,
+                <span class="str">"https://api.exchangerate-api.com/v4/latest/USD"</span>
+            ),
+            <span class="fn">safe_fetch</span>(client,
+                <span class="str">"https://data.nasdaq.com/api/v3/datasets/CHRIS/CME_CL1"</span>
+            ),
+        )
+
+    <span class="kw">return</span> {
+        <span class="str">"news_articles"</span>: news.get(<span class="str">"articles"</span>, [])[:5],
+        <span class="str">"pkr_per_usd"</span>:   fx.get(<span class="str">"rates"</span>, {}).get(<span class="str">"PKR"</span>),
+        <span class="str">"shipping_index"</span>: shipping
+    }
+
+
+<span class="cm"># ── Inside a FastAPI route ──</span>
+<span class="dec">@app.get</span>(<span class="str">"/intelligence"</span>)
+<span class="kw">async def</span> <span class="fn">get_intelligence</span>(cargo: str):
+    <span class="cm"># FastAPI is already async — just await it directly</span>
+    data = <span class="kw">await</span> <span class="fn">multi_agent_fetch</span>(cargo)
+    <span class="kw">return</span> data</pre>
+    </div>
+
+    <div class="side-by-side">
+      <div class="info-box" style="margin-bottom:0;">
+        <span class="info-box-icon">🐢</span>
+        <div class="info-box-body">
+          <strong>Sequential (slow)</strong>
+          <p>news = await fetch_news(q) &nbsp;→ 1.2s<br>fx = await fetch_fx() &nbsp;&nbsp;&nbsp;&nbsp;→ 0.8s<br><strong style="color:#ef4444;">Total: 2.0 seconds</strong></p>
+        </div>
+      </div>
+      <div class="info-box green" style="margin-bottom:0;">
+        <span class="info-box-icon">🚀</span>
+        <div class="info-box-body">
+          <strong>Parallel (fast)</strong>
+          <p>news, fx = await asyncio.gather(...)<br>Both fire at t=0, both finish ~1.2s<br><strong style="color:#22d3a0;">Total: 1.2 seconds</strong></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ══════════════════════════════════════════════════════
+       TOPIC 04 — PYTHON-DOTENV
+  ══════════════════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num purple">04</span>
+      <div>
+        <div class="section-title">Load API Keys from <code style="font-size:18px">.env</code> with python-dotenv</div>
+        <div class="section-desc">Same pattern as Node.js dotenv. Never hardcode secrets. Git-safe from day one.</div>
+      </div>
+    </div>
+
+    <div class="info-box">
+      <span class="info-box-icon">🔑</span>
+      <div class="info-box-body">
+        <strong>Same concept, different package name</strong>
+        <p>In Node.js you use <code>require('dotenv').config()</code>. In Python you use <code>from dotenv import load_dotenv; load_dotenv()</code>. Both read a <code>.env</code> file and inject variables into the process environment. From that point, <code>os.getenv('KEY')</code> (Python) works exactly like <code>process.env.KEY</code> (Node.js).</p>
+      </div>
+    </div>
+
+    <div class="side-by-side">
+      <div class="card">
+        <div class="card-label" style="color:var(--node);"><span class="dot dot-node"></span>Node.js pattern</div>
+        <pre><span class="cm">// .env file (same format)</span>
+ANTHROPIC_API_KEY=sk-ant-...
+NEWS_API_KEY=abc123
+OPENWEATHER_KEY=xyz789
+
+<span class="cm">// index.js</span>
+require(<span class="str">'dotenv'</span>).config();
+
+<span class="kw">const</span> key = process.env.ANTHROPIC_API_KEY;
+console.log(key);  <span class="cm">// sk-ant-...</span></pre>
+      </div>
+      <div class="card">
+        <div class="card-label" style="color:var(--python);"><span class="dot dot-blue"></span>Python pattern</div>
+        <pre><span class="cm"># .env file (IDENTICAL format)</span>
+<span class="cm"># ANTHROPIC_API_KEY=sk-ant-...</span>
+<span class="cm"># NEWS_API_KEY=abc123</span>
+<span class="cm"># OPENWEATHER_KEY=xyz789</span>
+
+<span class="cm"># config.py</span>
+<span class="kw">import</span> os
+<span class="kw">from</span> dotenv <span class="kw">import</span> load_dotenv
+
+load_dotenv()  <span class="cm"># reads .env into env</span>
+
+key = os.getenv(<span class="str">"ANTHROPIC_API_KEY"</span>)
+print(key)  <span class="cm"># sk-ant-...</span></pre>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-label"><span class="dot dot-purple"></span>PRODUCTION PATTERN — config.py for your hackathon project</div>
+      <pre><span class="cm"># config.py  ← import this everywhere, never os.getenv inline</span>
+<span class="kw">import</span> os
+<span class="kw">from</span> dotenv <span class="kw">import</span> load_dotenv
+
+load_dotenv()  <span class="cm"># call once, works for entire process</span>
+
+<span class="kw">class</span> <span class="cls">Config</span>:
+    <span class="cm"># Claude / Anthropic</span>
+    ANTHROPIC_API_KEY: str = os.getenv(<span class="str">"ANTHROPIC_API_KEY"</span>, <span class="str">""</span>)
+
+    <span class="cm"># External APIs</span>
+    NEWS_API_KEY: str      = os.getenv(<span class="str">"NEWS_API_KEY"</span>, <span class="str">""</span>)
+    OPENWEATHER_KEY: str   = os.getenv(<span class="str">"OPENWEATHER_KEY"</span>, <span class="str">""</span>)
+    EXCHANGE_API_KEY: str  = os.getenv(<span class="str">"EXCHANGE_API_KEY"</span>, <span class="str">""</span>)
+    TWILIO_SID: str        = os.getenv(<span class="str">"TWILIO_ACCOUNT_SID"</span>, <span class="str">""</span>)
+    TWILIO_TOKEN: str      = os.getenv(<span class="str">"TWILIO_AUTH_TOKEN"</span>, <span class="str">""</span>)
+
+    <span class="cm"># Safety check — call this at startup</span>
+    <span class="dec">@classmethod</span>
+    <span class="kw">def</span> <span class="fn">validate</span>(cls):
+        missing = [k <span class="kw">for</span> k, v <span class="kw">in</span> vars(cls).items()
+                   <span class="kw">if not</span> k.startswith(<span class="str">"_"</span>) <span class="kw">and</span> v == <span class="str">""</span>]
+        <span class="kw">if</span> missing:
+            print(<span class="str">f"⚠️  Missing env vars: {missing}"</span>)
+
+config = <span class="cls">Config</span>()
+
+<span class="cm"># ─────────────────────────────────────────────────
+# Usage in any other file:
+# from config import config
+# client = anthropic.Anthropic(api_key=config.ANTHROPIC_API_KEY)
+# ─────────────────────────────────────────────────</span></pre>
+    </div>
+
+    <div class="card">
+      <div class="card-label"><span class="dot dot-purple"></span>.env file — copy this template, fill in your keys</div>
+      <pre><span class="cm"># .env  ← NEVER commit this file to Git</span>
+<span class="cm"># Add .env to your .gitignore immediately</span>
+
+ANTHROPIC_API_KEY=sk-ant-YOUR_KEY_HERE
+NEWS_API_KEY=YOUR_NEWSAPI_KEY
+OPENWEATHER_KEY=YOUR_OPENWEATHER_KEY
+EXCHANGE_API_KEY=YOUR_EXCHANGERATE_KEY
+TWILIO_ACCOUNT_SID=YOUR_TWILIO_SID
+TWILIO_AUTH_TOKEN=YOUR_TWILIO_TOKEN</pre>
+    </div>
+
+    <div class="card">
+      <div class="card-label"><span class="dot dot-purple"></span>.gitignore — add these immediately</div>
+      <pre>.env
+env/
+__pycache__/
+*.pyc
+.DS_Store</pre>
+    </div>
+
+    <div class="info-box amber">
+      <span class="info-box-icon">⚠️</span>
+      <div class="info-box-body">
+        <strong>Hackathon Day Rule</strong>
+        <p>Set up your <code>.gitignore</code> and <code>.env</code> in Hour 0. If you push your Anthropic API key to a public GitHub repo, it gets revoked automatically within minutes. You'll waste 30 minutes of your 8-hour window getting a new key. Don't learn this the hard way.</p>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ══════════════════════════════════════════════════════
+       TOPIC 05 — PYTHON CLASSES
+  ══════════════════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num red">05</span>
+      <div>
+        <div class="section-title">Python Classes — <code style="font-size:18px">__init__</code>, Methods &amp; Usage</div>
+        <div class="section-desc">Python classes are how you'll structure your agents, calculators, and data models at the hackathon.</div>
+      </div>
+    </div>
+
+    <div class="info-box">
+      <span class="info-box-icon">🏗️</span>
+      <div class="info-box-body">
+        <strong>JS vs Python class syntax — the key differences</strong>
+        <p>Python uses <code>self</code> where JS uses <code>this</code>. Python's constructor is <code>__init__</code> (with double underscores) where JS uses <code>constructor</code>. Every instance method must take <code>self</code> as its first parameter. Python has no <code>new</code> keyword — you call the class like a function.</p>
+      </div>
+    </div>
+
+    <div class="side-by-side">
+      <div class="card">
+        <div class="card-label" style="color:var(--node);"><span class="dot dot-node"></span>JavaScript class</div>
+        <pre><span class="kw">class</span> <span class="cls">ShipmentAnalyzer</span> {
+  constructor(api_key, route) {
+    this.api_key = api_key;
+    this.route   = route;
+    this.risk    = <span class="num">0</span>;
+  }
+
+  <span class="fn">analyze</span>(cargo) {
+    <span class="kw">const</span> result = ...;
+    this.risk = result.score;
+    <span class="kw">return</span> result;
+  }
+
+  <span class="fn">getRisk</span>() {
+    <span class="kw">return</span> this.risk;
+  }
+}
+
+<span class="cm">// Usage</span>
+<span class="kw">const</span> analyzer = <span class="kw">new</span> <span class="cls">ShipmentAnalyzer</span>(
+  <span class="str">"sk-ant-..."</span>, <span class="str">"Suez"</span>
+);
+analyzer.analyze(<span class="str">"Electronics"</span>);</pre>
+      </div>
+      <div class="card">
+        <div class="card-label" style="color:var(--python);"><span class="dot dot-blue"></span>Python class</div>
+        <pre><span class="kw">class</span> <span class="cls">ShipmentAnalyzer</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, api_key: str,
+                 route: str):
+        self.api_key = api_key
+        self.route   = route
+        self.risk    = <span class="num">0</span>
+        <span class="cm"># No 'new', no {}, just self</span>
+
+    <span class="kw">def</span> <span class="fn">analyze</span>(self, cargo: str):
+        result = ...
+        self.risk = result[<span class="str">"score"</span>]
+        <span class="kw">return</span> result
+
+    <span class="kw">def</span> <span class="fn">get_risk</span>(self) -> int:
+        <span class="kw">return</span> self.risk
+
+<span class="cm"># Usage — no 'new' keyword</span>
+analyzer = <span class="cls">ShipmentAnalyzer</span>(
+    <span class="str">"sk-ant-..."</span>, <span class="str">"Suez"</span>
+)
+analyzer.analyze(<span class="str">"Electronics"</span>)</pre>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-label"><span class="dot dot-red"></span>FULL EXAMPLE — CargoAgent class with __init__, instance methods, class methods, and async</div>
+      <pre><span class="kw">import</span> asyncio, os
+<span class="kw">import</span> anthropic
+<span class="kw">from</span> dotenv <span class="kw">import</span> load_dotenv
+
+load_dotenv()
+
+
+<span class="kw">class</span> <span class="cls">CargoAgent</span>:
+    <span class="cm">"""
+    Analyzes shipment risk for Pakistani importers.
+    Demonstrates: __init__, instance methods, class
+    methods, static methods, and async methods.
+    """</span>
+
+    <span class="cm"># Class variable (shared across ALL instances)</span>
+    SUPPORTED_ROUTES = [<span class="str">"Suez"</span>, <span class="str">"Hormuz"</span>, <span class="str">"Cape"</span>]
+
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, route: str, cargo_type: str):
+        <span class="cm">"""Constructor — runs when you create an instance."""</span>
+        self.route      = route       <span class="cm"># instance variable</span>
+        self.cargo_type = cargo_type
+        self.risk_score = <span class="num">0</span>
+        self.analysis   = <span class="kw">None</span>
+        self.client     = anthropic.Anthropic(
+            api_key=os.getenv(<span class="str">"ANTHROPIC_API_KEY"</span>)
+        )
+
+    <span class="cm"># ── Instance method ──</span>
+    <span class="kw">def</span> <span class="fn">describe</span>(self) -> str:
+        <span class="cm">"""Regular method — has access to self."""</span>
+        <span class="kw">return</span> (
+            <span class="str">f"Route: {self.route} | "</span>
+            <span class="str">f"Cargo: {self.cargo_type} | "</span>
+            <span class="str">f"Risk: {self.risk_score}/10"</span>
+        )
+
+    <span class="cm"># ── Async instance method ──</span>
+    <span class="kw">async def</span> <span class="fn">analyze</span>(self, news_context: str) -> dict:
+        <span class="cm">"""Calls Claude, stores result on self."""</span>
+        prompt = (
+            <span class="str">f"Analyze shipment risk:\n"</span>
+            <span class="str">f"Route: {self.route}\n"</span>
+            <span class="str">f"Cargo: {self.cargo_type}\n"</span>
+            <span class="str">f"Context: {news_context}\n"</span>
+            <span class="str">"Return a risk score 1-10 and brief reason."</span>
+        )
+
+        response = self.client.messages.create(
+            model=<span class="str">"claude-sonnet-4-20250514"</span>,
+            max_tokens=<span class="num">300</span>,
+            messages=[{<span class="str">"role"</span>: <span class="str">"user"</span>, <span class="str">"content"</span>: prompt}]
+        )
+
+        self.analysis   = response.content[<span class="num">0</span>].text
+        self.risk_score = self.<span class="fn">_parse_score</span>(self.analysis)
+        <span class="kw">return</span> {<span class="str">"score"</span>: self.risk_score, <span class="str">"reason"</span>: self.analysis}
+
+    <span class="cm"># ── Private helper method (convention: _ prefix) ──</span>
+    <span class="kw">def</span> <span class="fn">_parse_score</span>(self, text: str) -> int:
+        <span class="cm">"""Extract integer score from Claude's response."""</span>
+        <span class="kw">for</span> word <span class="kw">in</span> text.split():
+            <span class="kw">if</span> word.isdigit() <span class="kw">and</span> <span class="num">1</span> <= int(word) <= <span class="num">10</span>:
+                <span class="kw">return</span> int(word)
+        <span class="kw">return</span> <span class="num">5</span>  <span class="cm"># default</span>
+
+    <span class="cm"># ── Class method (operates on the class, not an instance) ──</span>
+    <span class="dec">@classmethod</span>
+    <span class="kw">def</span> <span class="fn">from_query</span>(cls, query: str) -> <span class="str">"CargoAgent"</span>:
+        <span class="cm">"""Alternative constructor — parses a text query."""</span>
+        route = <span class="str">"Suez"</span>  <span class="cm"># simplified parse</span>
+        <span class="kw">for</span> r <span class="kw">in</span> cls.SUPPORTED_ROUTES:
+            <span class="kw">if</span> r.lower() <span class="kw">in</span> query.lower():
+                route = r
+        <span class="kw">return</span> cls(route=route, cargo_type=<span class="str">"General"</span>)
+
+    <span class="cm"># ── Static method (utility — no self, no cls) ──</span>
+    <span class="dec">@staticmethod</span>
+    <span class="kw">def</span> <span class="fn">risk_label</span>(score: int) -> str:
+        <span class="kw">if</span> score >= <span class="num">8</span>:  <span class="kw">return</span> <span class="str">"🔴 HIGH"</span>
+        <span class="kw">if</span> score >= <span class="num">5</span>:  <span class="kw">return</span> <span class="str">"🟡 MEDIUM"</span>
+        <span class="kw">return</span> <span class="str">"🟢 LOW"</span>
+
+
+<span class="cm"># ──────────────────────────────────────────────
+# USAGE
+# ──────────────────────────────────────────────</span>
+<span class="kw">async def</span> <span class="fn">main</span>():
+    <span class="cm"># Standard construction</span>
+    agent = <span class="cls">CargoAgent</span>(route=<span class="str">"Hormuz"</span>, cargo_type=<span class="str">"Electronics"</span>)
+
+    <span class="cm"># Alternative constructor via classmethod</span>
+    agent2 = CargoAgent.from_query(<span class="str">"Suez route textiles"</span>)
+
+    <span class="cm"># Call async method</span>
+    result = <span class="kw">await</span> agent.analyze(<span class="str">"US/Iran tensions escalating"</span>)
+
+    <span class="cm"># Instance method</span>
+    print(agent.describe())
+
+    <span class="cm"># Static method (no instance needed)</span>
+    label = <span class="cls">CargoAgent</span>.risk_label(result[<span class="str">"score"</span>])
+    print(<span class="str">f"Risk level: {label}"</span>)
+
+
+<span class="kw">if</span> __name__ == <span class="str">"__main__"</span>:
+    asyncio.run(<span class="fn">main</span>())</pre>
+    </div>
+
+    <!-- Quick reference table -->
+    <div class="card">
+      <div class="card-label"><span class="dot dot-red"></span>QUICK REFERENCE — all method types at a glance</div>
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th>Type</th>
+            <th>Decorator / Signature</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Constructor</td><td>def __init__(self, arg1, arg2):</td></tr>
+          <tr><td>Instance method</td><td>def my_method(self):</td></tr>
+          <tr><td>Async instance method</td><td>async def my_method(self):</td></tr>
+          <tr><td>Private (by convention)</td><td>def _helper(self):</td></tr>
+          <tr><td>Class method</td><td>@classmethod  /  def method(cls):</td></tr>
+          <tr><td>Static method</td><td>@staticmethod  /  def method():</td></tr>
+          <tr><td>Property (getter)</td><td>@property  /  def my_prop(self):</td></tr>
+          <tr><td>String representation</td><td>def __repr__(self): return f"..."</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="info-box green">
+      <span class="info-box-icon">🧠</span>
+      <div class="info-box-body">
+        <strong>Which class type should you use at the hackathon?</strong>
+        <p>For your agent logic (CargoAgent, SupplierChecker, FXAdvisor): plain Python class with <code>__init__</code> + async methods. For request/response data models: <strong>Pydantic's BaseModel</strong> (which is also a Python class). Pydantic models auto-validate, auto-document, and auto-serialize to JSON — use them for all FastAPI endpoints.</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-label"><span class="dot dot-red"></span>PYDANTIC BaseModel — the class type you'll use most in FastAPI</div>
+      <pre><span class="kw">from</span> pydantic <span class="kw">import</span> BaseModel
+<span class="kw">from</span> typing <span class="kw">import</span> Optional
+<span class="kw">from</span> fastapi <span class="kw">import</span> FastAPI
+
+app = FastAPI()
+
+<span class="cm"># Define your data model — Python class inheriting BaseModel</span>
+<span class="kw">class</span> <span class="cls">ShipmentRequest</span>(BaseModel):
+    cargo_type: str
+    route: str
+    value_usd: float
+    currency: Optional[str] = <span class="str">"USD"</span>   <span class="cm"># default value</span>
+
+<span class="kw">class</span> <span class="cls">RiskResponse</span>(BaseModel):
+    risk_score: int
+    label: str
+    recommendation: str
+    estimated_cost_pkr: float
+
+<span class="cm"># FastAPI reads ShipmentRequest from the POST body automatically</span>
+<span class="dec">@app.post</span>(<span class="str">"/analyze"</span>, response_model=<span class="cls">RiskResponse</span>)
+<span class="kw">async def</span> <span class="fn">analyze_shipment</span>(req: <span class="cls">ShipmentRequest</span>):
+    <span class="cm"># req.cargo_type, req.route, req.value_usd — all type-safe</span>
+    agent = <span class="cls">CargoAgent</span>(req.route, req.cargo_type)
+    result = <span class="kw">await</span> agent.analyze(<span class="str">"context here"</span>)
+
+    <span class="kw">return</span> <span class="cls">RiskResponse</span>(
+        risk_score=result[<span class="str">"score"</span>],
+        label=<span class="cls">CargoAgent</span>.risk_label(result[<span class="str">"score"</span>]),
+        recommendation=result[<span class="str">"reason"</span>],
+        estimated_cost_pkr=req.value_usd * <span class="num">278.5</span>
+    )</pre>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ══════════════════════════════════════════════════════
+       BONUS — PROJECT STRUCTURE
+  ══════════════════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num" style="background:#475569;">⊕</span>
+      <div>
+        <div class="section-title">Recommended Project Structure for Your Hackathon</div>
+        <div class="section-desc">Put this in place in Hour 0. Saves time later.</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-label"><span class="dot dot-blue"></span>FOLDER STRUCTURE — any hackathon idea from your Master Plan</div>
+      <pre><span class="cm">your-project/
+├── .env                  ← API keys (never commit)</span>
+├── .gitignore            <span class="cm">← includes .env, env/</span>
+├── requirements.txt      <span class="cm">← pip freeze output</span>
+├── main.py               <span class="cm">← FastAPI app + router mounts</span>
+├── config.py             <span class="cm">← load_dotenv + Config class</span>
+│
+├── agents/               <span class="cm">← your Python classes</span>
+│   ├── __init__.py
+│   ├── cargo_agent.py    <span class="cm">← CargoAgent class</span>
+│   ├── news_agent.py     <span class="cm">← NewsAgent class</span>
+│   └── fx_agent.py       <span class="cm">← FXAgent class</span>
+│
+├── routes/               <span class="cm">← FastAPI APIRouter files</span>
+│   ├── __init__.py
+│   ├── shipment.py       <span class="cm">← /shipment endpoints</span>
+│   └── analysis.py       <span class="cm">← /analysis endpoints</span>
+│
+├── models/               <span class="cm">← Pydantic BaseModel classes</span>
+│   ├── __init__.py
+│   └── schemas.py
+│
+├── utils/                <span class="cm">← asyncio.gather wrappers, helpers</span>
+│   └── parallel.py
+│
+└── app.py                <span class="cm">← Streamlit UI (if using Streamlit)</span></pre>
+    </div>
+
+    <div class="card">
+      <div class="card-label"><span class="dot dot-green"></span>THE MINIMUM VIABLE main.py — paste this at Hour 0</div>
+      <pre><span class="kw">from</span> fastapi <span class="kw">import</span> FastAPI
+<span class="kw">from</span> config <span class="kw">import</span> config
+
+app = FastAPI(
+    title=<span class="str">"CargoSense API"</span>,
+    description=<span class="str">"Shipment intelligence for Pakistani importers"</span>,
+    version=<span class="str">"1.0.0"</span>
+)
+
+config.validate()  <span class="cm"># warn if any env vars missing</span>
+
+<span class="dec">@app.get</span>(<span class="str">"/"</span>)
+<span class="kw">async def</span> <span class="fn">health</span>():
+    <span class="kw">return</span> {<span class="str">"status"</span>: <span class="str">"ok"</span>, <span class="str">"team"</span>: <span class="str">"YourTeamName"</span>}
+
+<span class="cm"># Mount routers as you build them</span>
+<span class="cm"># from routes.shipment import router as shipment_router</span>
+<span class="cm"># app.include_router(shipment_router, prefix="/api")</span>
+
+<span class="cm"># Run: uvicorn main:app --reload</span>
+<span class="cm"># Docs: http://localhost:8000/docs</span></pre>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  Python + FastAPI Hackathon Reference Guide &nbsp;·&nbsp; <strong>Agentic AI Hackathon May 2026</strong> &nbsp;·&nbsp; Sourced from official Python &amp; FastAPI documentation
+</footer>
+
+</body>
+</html>
