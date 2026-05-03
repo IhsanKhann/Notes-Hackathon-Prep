@@ -1,0 +1,1066 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gemini API — Complete Developer Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:        #080c0a;
+  --surface:   #0c1210;
+  --card:      #101914;
+  --raised:    #141f18;
+  --border:    #1a2e20;
+  --border2:   #223328;
+  --gem-blue:  #1a73e8;
+  --gem-green: #1e8e3e;
+  --gem-teal:  #00897b;
+  --gem-cyan:  #00bcd4;
+  --gem-gold:  #f9ab00;
+  --gem-red:   #d93025;
+  --gem-purple:#7c4dff;
+  --cyan:      #26c6da;
+  --text:      #c8d8cc;
+  --text-dim:  #52695a;
+  --white:     #edf4ef;
+  --code-bg:   #050908;
+  --mono: 'IBM Plex Mono', monospace;
+  --sans: 'DM Sans', sans-serif;
+  --display: 'Bebas Neue', sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:15px;line-height:1.7;}
+
+body::before{
+  content:'';position:fixed;inset:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.07) 2px,rgba(0,0,0,.07) 4px);
+  pointer-events:none;z-index:9999;
+}
+
+header{
+  background:linear-gradient(160deg,#091410 0%,#080c0a 60%);
+  border-bottom:1px solid var(--border);
+  padding:56px 48px 44px;
+  position:relative;overflow:hidden;
+}
+header::after{
+  content:'';position:absolute;right:-60px;top:-60px;
+  width:420px;height:420px;
+  background:radial-gradient(circle,rgba(26,115,232,.1) 0%,transparent 70%);
+  pointer-events:none;
+}
+header::before{
+  content:'';position:absolute;left:40%;bottom:-40px;
+  width:300px;height:300px;
+  background:radial-gradient(circle,rgba(0,188,212,.06) 0%,transparent 70%);
+  pointer-events:none;
+}
+.h-eyebrow{font-family:var(--mono);font-size:10px;letter-spacing:3px;color:var(--gem-cyan);text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:10px;}
+.h-eyebrow::before{content:'';width:24px;height:1px;background:var(--gem-cyan);}
+header h1{font-family:var(--display);font-size:clamp(38px,5vw,72px);letter-spacing:2px;color:var(--white);line-height:1;margin-bottom:16px;}
+header h1 em{color:var(--gem-cyan);font-style:normal;}
+.h-sub{color:var(--text-dim);font-size:14px;max-width:600px;line-height:1.6;margin-bottom:28px;}
+.h-tags{display:flex;flex-wrap:wrap;gap:8px;}
+.tag{font-family:var(--mono);font-size:10px;letter-spacing:.5px;padding:4px 11px;border-radius:3px;border:1px solid;}
+.tag-b{color:var(--gem-blue);border-color:rgba(26,115,232,.3);background:rgba(26,115,232,.07);}
+.tag-g{color:var(--gem-green);border-color:rgba(30,142,62,.3);background:rgba(30,142,62,.07);}
+.tag-t{color:var(--gem-teal);border-color:rgba(0,137,123,.3);background:rgba(0,137,123,.07);}
+.tag-c{color:var(--gem-cyan);border-color:rgba(0,188,212,.3);background:rgba(0,188,212,.07);}
+.tag-gold{color:var(--gem-gold);border-color:rgba(249,171,0,.3);background:rgba(249,171,0,.07);}
+.tag-p{color:var(--gem-purple);border-color:rgba(124,77,255,.3);background:rgba(124,77,255,.07);}
+
+nav{background:var(--surface);border-bottom:1px solid var(--border);padding:0 48px;display:flex;gap:0;overflow-x:auto;}
+nav a{font-family:var(--mono);font-size:11px;letter-spacing:.5px;color:var(--text-dim);text-decoration:none;padding:14px 20px;border-bottom:2px solid transparent;white-space:nowrap;transition:all .2s;}
+nav a:hover{color:var(--white);border-color:var(--gem-cyan);}
+
+main{max-width:1000px;margin:0 auto;padding:60px 32px 100px;}
+
+.section{margin-bottom:80px;}
+.section-head{display:flex;align-items:flex-start;gap:18px;margin-bottom:32px;padding-bottom:20px;border-bottom:1px solid var(--border);}
+.s-num{font-family:var(--display);font-size:52px;line-height:1;flex-shrink:0;margin-top:-6px;}
+.s-num.c1{color:var(--gem-cyan);}
+.s-num.c2{color:var(--gem-blue);}
+.s-num.c3{color:var(--gem-gold);}
+.s-num.c4{color:var(--gem-purple);}
+.s-num.c5{color:var(--gem-teal);}
+.s-num.c6{color:var(--gem-green);}
+.s-head-text h2{font-family:var(--display);font-size:26px;letter-spacing:1px;color:var(--white);line-height:1.2;}
+.s-head-text p{color:var(--text-dim);font-size:13px;margin-top:5px;}
+
+.why{background:var(--card);border:1px solid var(--border);border-left:3px solid var(--gem-cyan);border-radius:0 8px 8px 0;padding:16px 20px;margin-bottom:24px;font-size:13.5px;}
+.why.blue  {border-left-color:var(--gem-blue);}
+.why.gold  {border-left-color:var(--gem-gold);}
+.why.purple{border-left-color:var(--gem-purple);}
+.why.teal  {border-left-color:var(--gem-teal);}
+.why.green {border-left-color:var(--gem-green);}
+.why.red   {border-left-color:var(--gem-red);}
+.why-label{font-family:var(--mono);font-size:9px;letter-spacing:2px;color:var(--gem-cyan);text-transform:uppercase;margin-bottom:6px;}
+.why.blue   .why-label{color:var(--gem-blue);}
+.why.gold   .why-label{color:var(--gem-gold);}
+.why.purple .why-label{color:var(--gem-purple);}
+.why.teal   .why-label{color:var(--gem-teal);}
+.why.green  .why-label{color:var(--gem-green);}
+.why.red    .why-label{color:var(--gem-red);}
+.why p{color:var(--text);line-height:1.6;}
+
+.code-wrap{margin-bottom:20px;}
+.code-label{background:var(--raised);border:1px solid var(--border);border-bottom:none;border-radius:6px 6px 0 0;padding:8px 14px;display:flex;align-items:center;gap:10px;font-family:var(--mono);font-size:10px;letter-spacing:1px;color:var(--text-dim);}
+.cl-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.cl-c{background:var(--gem-cyan);}
+.cl-b{background:var(--gem-blue);}
+.cl-g{background:var(--gem-green);}
+.cl-gold{background:var(--gem-gold);}
+.cl-p{background:var(--gem-purple);}
+.cl-t{background:var(--gem-teal);}
+.cl-r{background:var(--gem-red);}
+pre{background:var(--code-bg);border:1px solid var(--border);border-radius:0 0 6px 6px;padding:20px 18px;overflow-x:auto;font-family:var(--mono);font-size:12.5px;line-height:1.75;}
+code{font-family:var(--mono);font-size:12.5px;}
+
+.kw{color:#80cbc4;}
+.fn{color:#82aaff;}
+.st{color:#c3e88d;}
+.cm{color:#37474f;font-style:italic;}
+.nm{color:#f78c6c;}
+.cl{color:#a6da95;}
+.dc{color:#80cbc4;}
+.op{color:#89ddff;}
+.vr{color:#eeffff;}
+.hl {background:rgba(0,188,212,.1);display:block;margin:0 -18px;padding:0 18px;}
+.hl-g{background:rgba(30,142,62,.09);display:block;margin:0 -18px;padding:0 18px;}
+.hl-gold{background:rgba(249,171,0,.07);display:block;margin:0 -18px;padding:0 18px;}
+.hl-p{background:rgba(124,77,255,.08);display:block;margin:0 -18px;padding:0 18px;}
+
+.steps{display:flex;flex-direction:column;gap:14px;margin-bottom:24px;}
+.step{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:16px 18px;display:flex;gap:16px;}
+.step-n{font-family:var(--display);font-size:26px;color:var(--border2);flex-shrink:0;line-height:1;margin-top:2px;min-width:30px;}
+.step-body strong{display:block;color:var(--white);font-size:14px;margin-bottom:4px;}
+.step-body p{color:var(--text-dim);font-size:13px;line-height:1.55;}
+.step-body code{background:rgba(255,255,255,.06);padding:1px 5px;border-radius:3px;color:var(--gem-cyan);font-size:11.5px;}
+
+.alert{border-radius:6px;padding:14px 18px;margin-bottom:20px;display:flex;gap:12px;font-size:13px;align-items:flex-start;}
+.alert-info{background:rgba(0,188,212,.06);border:1px solid rgba(0,188,212,.2);}
+.alert-warn{background:rgba(249,171,0,.06);border:1px solid rgba(249,171,0,.2);}
+.alert-ok{background:rgba(30,142,62,.06);border:1px solid rgba(30,142,62,.2);}
+.alert-danger{background:rgba(217,48,37,.06);border:1px solid rgba(217,48,37,.2);}
+.alert-icon{font-size:16px;flex-shrink:0;margin-top:1px;}
+.alert-body strong{display:block;color:var(--white);margin-bottom:3px;font-size:13px;}
+.alert-body p{color:var(--text-dim);line-height:1.5;}
+.alert-body code{background:rgba(255,255,255,.08);padding:1px 5px;border-radius:3px;color:var(--gem-cyan);font-size:11px;font-family:var(--mono);}
+
+.flow{display:flex;align-items:center;flex-wrap:wrap;gap:0;margin:24px 0;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:20px 24px;}
+.flow-box{background:var(--raised);border:1px solid var(--border2);border-radius:6px;padding:10px 16px;text-align:center;min-width:110px;}
+.flow-box .fb-label{font-family:var(--mono);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-dim);margin-bottom:4px;}
+.flow-box .fb-name{font-weight:600;color:var(--white);font-size:13px;}
+.flow-arrow{font-family:var(--mono);color:var(--border2);font-size:20px;padding:0 10px;flex-shrink:0;}
+.fb-c{border-color:rgba(0,188,212,.35);}
+.fb-b{border-color:rgba(26,115,232,.35);}
+.fb-gold{border-color:rgba(249,171,0,.35);}
+.fb-p{border-color:rgba(124,77,255,.35);}
+.fb-g{border-color:rgba(30,142,62,.35);}
+
+.concept-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:24px;}
+@media(max-width:640px){.concept-grid{grid-template-columns:1fr;}}
+.concept-card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:16px 18px;}
+.cc-icon{font-size:22px;margin-bottom:8px;}
+.cc-name{font-family:var(--mono);font-size:11px;letter-spacing:1px;color:var(--gem-cyan);margin-bottom:6px;text-transform:uppercase;}
+.cc-desc{font-size:13px;color:var(--text-dim);line-height:1.5;}
+
+table{width:100%;border-collapse:collapse;margin-bottom:20px;font-size:13px;}
+th{font-family:var(--mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--text-dim);padding:10px 14px;border-bottom:1px solid var(--border);text-align:left;}
+td{padding:9px 14px;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:top;line-height:1.5;color:var(--text);}
+tr:last-child td{border-bottom:none;}
+td code{font-family:var(--mono);font-size:11px;background:rgba(255,255,255,.05);padding:1px 5px;border-radius:3px;color:var(--gem-cyan);}
+.td-g{color:var(--gem-green);}
+.td-gold{color:var(--gem-gold);}
+.td-r{color:var(--gem-red);}
+
+hr{border:none;height:1px;background:linear-gradient(to right,transparent,var(--border),transparent);margin:60px 0;}
+footer{text-align:center;color:var(--text-dim);font-family:var(--mono);font-size:11px;padding:32px;border-top:1px solid var(--border);letter-spacing:.5px;}
+footer strong{color:var(--gem-cyan);}
+p code,li code{font-family:var(--mono);font-size:11.5px;background:rgba(255,255,255,.06);padding:1px 5px;border-radius:3px;color:var(--gem-cyan);}
+ul{margin:10px 0 16px 20px;}
+li{margin-bottom:6px;color:var(--text);font-size:13.5px;line-height:1.55;}
+h3{color:var(--white);font-size:15px;margin-bottom:14px;font-family:var(--mono);letter-spacing:1px;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="h-eyebrow">// Google AI · Gemini API · Direct Access</div>
+  <h1>GEMINI API<br><em>COMPLETE GUIDE</em></h1>
+  <p class="h-sub">Six core capabilities — text generation, system prompts, multi-turn memory, tool calling, multimodal input, and streaming — explained with working Python code built around your hackathon projects.</p>
+  <div class="h-tags">
+    <span class="tag tag-c">Text Generation</span>
+    <span class="tag tag-b">System Prompts</span>
+    <span class="tag tag-gold">Multi-Turn Chat</span>
+    <span class="tag tag-p">Function Calling</span>
+    <span class="tag tag-t">Multimodal</span>
+    <span class="tag tag-g">Streaming</span>
+  </div>
+</header>
+
+<nav>
+  <a href="#concepts">Concepts</a>
+  <a href="#setup">Setup</a>
+  <a href="#text">Text Gen</a>
+  <a href="#system">System Prompts</a>
+  <a href="#multiturn">Multi-Turn</a>
+  <a href="#tools">Tool Calling</a>
+  <a href="#multimodal">Multimodal</a>
+  <a href="#streaming">Streaming</a>
+  <a href="#tasks">Hands-On Tasks</a>
+</nav>
+
+<main>
+
+<!-- ══════ HOW GEMINI THINKS ══════ -->
+<div class="section" id="concepts" style="margin-top:0;padding-top:0;">
+  <div class="section-head">
+    <div class="s-num c1">◈</div>
+    <div class="s-head-text">
+      <h2>HOW GEMINI THINKS — THE MENTAL MODEL</h2>
+      <p>Understand this before writing a single line of code</p>
+    </div>
+  </div>
+
+  <div class="why">
+    <div class="why-label">↳ The Stateless Truth</div>
+    <p>Gemini has <strong style="color:var(--white);">no memory between API calls.</strong> Every call is completely independent. When you want a "conversation," you are not connecting to the same session — you are sending the <em>entire conversation history as text</em> with every single request. This is not a limitation to work around; it is the architecture. Understanding this is the difference between a chatbot that forgets everything and one that maintains context perfectly.</p>
+  </div>
+
+  <div class="concept-grid">
+    <div class="concept-card">
+      <div class="cc-icon">📨</div>
+      <div class="cc-name">Request → Response</div>
+      <div class="cc-desc">Every API call is: you send a <code>contents</code> list (your conversation), Gemini reads all of it, generates the next token sequence, returns it. No persistent connection.</div>
+    </div>
+    <div class="concept-card">
+      <div class="cc-icon">🧠</div>
+      <div class="cc-name">Context Window</div>
+      <div class="cc-desc">Gemini 1.5 Flash/Pro has a 1M token context window. Your entire conversation history, documents, and code can fit inside a single call. This is your "memory."</div>
+    </div>
+    <div class="concept-card">
+      <div class="cc-icon">🎭</div>
+      <div class="cc-name">System Instruction</div>
+      <div class="cc-desc">A special pre-conversation message that shapes the model's persona, constraints, and output format for the entire session. Injected before any user message.</div>
+    </div>
+    <div class="concept-card">
+      <div class="cc-icon">🔧</div>
+      <div class="cc-name">Function Calling</div>
+      <div class="cc-desc">You tell Gemini what Python functions exist. When relevant, Gemini responds with a <em>request to call</em> that function. Your code calls it, returns the result, Gemini continues. It never calls your code directly.</div>
+    </div>
+    <div class="concept-card">
+      <div class="cc-icon">🖼️</div>
+      <div class="cc-name">Multimodal Input</div>
+      <div class="cc-desc">The <code>contents</code> list accepts mixed types: text strings, image bytes, PDF pages, video frames. Gemini processes all modalities in one pass — not separate calls.</div>
+    </div>
+    <div class="concept-card">
+      <div class="cc-icon">⚡</div>
+      <div class="cc-name">Streaming</div>
+      <div class="cc-desc">Instead of waiting for the full response, Gemini sends chunks (tokens) as it generates them. Your code receives each chunk and can display it immediately — like watching someone type.</div>
+    </div>
+  </div>
+
+  <div class="flow">
+    <div class="flow-box fb-c"><div class="fb-label">Your App</div><div class="fb-name">Prompt</div></div>
+    <div class="flow-arrow">+</div>
+    <div class="flow-box fb-b"><div class="fb-label">History</div><div class="fb-name">Past Chat</div></div>
+    <div class="flow-arrow">+</div>
+    <div class="flow-box fb-gold"><div class="fb-label">System</div><div class="fb-name">Persona</div></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box fb-p"><div class="fb-label">Gemini API</div><div class="fb-name">Inference</div></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box fb-g"><div class="fb-label">Response</div><div class="fb-name">or Tool Call</div></div>
+  </div>
+</div>
+
+<hr>
+
+<!-- ══════ SETUP ══════ -->
+<div class="section" id="setup">
+  <div class="section-head">
+    <div class="s-num c1">00</div>
+    <div class="s-head-text">
+      <h2>SETUP — API KEY AND SDK INSTALLATION</h2>
+      <p>Task 12 & 13 — Free key from AI Studio, working response in under 5 minutes</p>
+    </div>
+  </div>
+
+  <div class="why">
+    <div class="why-label">↳ Gemini API Direct vs Vertex AI Auth</div>
+    <p>The Gemini API uses a simple <strong>API key</strong> — one string, no service accounts, no JSON files. This is intentional: it's designed for rapid prototyping and local development. For production apps deployed on GCP (your hackathon demo), you'll switch to Vertex AI auth. But for all local development, building agents, testing prompts — the API key approach is faster and requires zero infrastructure.</p>
+  </div>
+
+  <h3>GET YOUR API KEY</h3>
+  <div class="steps">
+    <div class="step"><span class="step-n" style="color:var(--gem-cyan);">1</span><div class="step-body"><strong>Go to Google AI Studio</strong><p>Visit <code>aistudio.google.com</code> — sign in with your Google account. No billing setup required for the free tier (Gemini 1.5 Flash, generous daily limits).</p></div></div>
+    <div class="step"><span class="step-n" style="color:var(--gem-cyan);">2</span><div class="step-body"><strong>Create API Key</strong><p>Click "Get API Key" → "Create API key in new project". Copy the key. It starts with <code>AIza...</code>. Store it in your <code>.env</code> file immediately as <code>GEMINI_API_KEY=AIza...</code>.</p></div></div>
+    <div class="step"><span class="step-n" style="color:var(--gem-cyan);">3</span><div class="step-body"><strong>Install the SDK</strong><p>Activate your venv, then install: <code>pip install google-generativeai python-dotenv</code>. Then <code>pip freeze &gt; requirements.txt</code>.</p></div></div>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-label"><span class="cl-dot cl-c"></span>POWERSHELL — install and verify</div>
+    <pre>.\venv\Scripts\activate
+pip install google-generativeai python-dotenv
+pip freeze > requirements.txt
+
+<span class="cm"># Add to .env</span>
+<span class="cm"># GEMINI_API_KEY=AIzaYourKeyHere</span></pre>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-label"><span class="cl-dot cl-c"></span>gemini_client.py — shared client module (import this everywhere)</div>
+    <pre><span class="kw">import</span> os
+<span class="kw">import</span> google.generativeai <span class="kw">as</span> genai
+<span class="kw">from</span> dotenv <span class="kw">import</span> load_dotenv
+
+load_dotenv()
+
+<span class="cm"># ── Configure once at module level ──</span>
+<span class="cm"># All genai calls in this process use this key automatically</span>
+genai.<span class="fn">configure</span>(api_key=os.<span class="fn">getenv</span>(<span class="st">"GEMINI_API_KEY"</span>))
+
+<span class="cm"># ── Model constants — change here, nowhere else ──</span>
+FLASH = <span class="st">"gemini-1.5-flash"</span>   <span class="cm"># fast, free tier, great for most tasks</span>
+PRO   = <span class="st">"gemini-1.5-pro"</span>     <span class="cm"># slower, smarter, for complex reasoning</span>
+
+<span class="cm"># ── Usage: from gemini_client import genai, FLASH, PRO</span></pre>
+  </div>
+</div>
+
+<hr>
+
+<!-- ══════ 01 TEXT GENERATION ══════ -->
+<div class="section" id="text">
+  <div class="section-head">
+    <div class="s-num c1">01</div>
+    <div class="s-head-text">
+      <h2>TEXT GENERATION — THE FOUNDATION</h2>
+      <p>Task 13 — Send a prompt, get a response. Master the request/response cycle.</p>
+    </div>
+  </div>
+
+  <div class="why">
+    <div class="why-label">↳ What generate_content() Actually Does</div>
+    <p>You call <code>model.generate_content(prompt)</code>. The SDK serialises your prompt into an HTTP POST to <code>generativelanguage.googleapis.com</code>, attaches your API key as a query parameter, and waits for the full response. The response object contains the text, token counts, finish reason, and safety ratings. <code>response.text</code> is the shortcut to the generated string.</p>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-label"><span class="cl-dot cl-c"></span>01_text_generation.py — Task 13</div>
+    <pre><span class="kw">import</span> os
+<span class="kw">import</span> google.generativeai <span class="kw">as</span> genai
+<span class="kw">from</span> dotenv <span class="kw">import</span> load_dotenv
+
+load_dotenv()
+genai.<span class="fn">configure</span>(api_key=os.<span class="fn">getenv</span>(<span class="st">"GEMINI_API_KEY"</span>))
+
+<span class="cm"># ── Instantiate the model ──</span>
+model = genai.<span class="cl">GenerativeModel</span>(<span class="st">"gemini-1.5-flash"</span>)
+
+<span class="cm"># ── Basic call — single string prompt ──</span>
+response = model.<span class="fn">generate_content</span>(
+    <span class="st">"What are the top 3 risks for a Pakistani importer "
+    "shipping electronics through the Suez Canal right now?"</span>
+)
+
+<span class="cm"># ── The text is here ──</span>
+print(response.text)
+
+<span class="cm"># ── Token usage — important for cost awareness ──</span>
+print(<span class="st">f"\n--- Token Usage ---"</span>)
+print(<span class="st">f"Input tokens:  {response.usage_metadata.prompt_token_count}"</span>)
+print(<span class="st">f"Output tokens: {response.usage_metadata.candidates_token_count}"</span>)
+print(<span class="st">f"Total:         {response.usage_metadata.total_token_count}"</span>)
+
+<span class="cm"># ── Finish reason — why Gemini stopped generating ──</span>
+<span class="cm"># STOP = natural end, MAX_TOKENS = hit limit, SAFETY = blocked</span>
+print(<span class="st">f"Finish reason: {response.candidates[0].finish_reason}"</span>)
+
+<span class="cm"># ── Generation config — control output behaviour ──</span>
+config = genai.<span class="cl">GenerationConfig</span>(
+    temperature=<span class="nm">0.7</span>,       <span class="cm"># 0.0 = deterministic, 1.0 = creative</span>
+    max_output_tokens=<span class="nm">500</span>, <span class="cm"># cap response length</span>
+    top_p=<span class="nm">0.95</span>,            <span class="cm"># nucleus sampling</span>
+)
+
+model_with_config = genai.<span class="cl">GenerativeModel</span>(
+    <span class="st">"gemini-1.5-flash"</span>,
+    generation_config=config
+)
+
+response2 = model_with_config.<span class="fn">generate_content</span>(
+    <span class="st">"Summarise the current state of PKR vs USD in 3 bullet points."</span>
+)
+print(response2.text)</pre>
+  </div>
+
+  <table>
+    <thead><tr><th>Parameter</th><th>Range</th><th>Effect</th><th>Your Use Case</th></tr></thead>
+    <tbody>
+      <tr><td><code>temperature</code></td><td>0.0–1.0</td><td>Randomness/creativity</td><td class="td-gold">0.2 for risk analysis, 0.8 for creative summaries</td></tr>
+      <tr><td><code>max_output_tokens</code></td><td>1–8192</td><td>Maximum response length</td><td>500 for chat, 2000 for reports</td></tr>
+      <tr><td><code>top_p</code></td><td>0.0–1.0</td><td>Diversity of token selection</td><td>0.95 default works for all cases</td></tr>
+      <tr><td><code>top_k</code></td><td>1–40</td><td>Limits vocabulary at each step</td><td>Leave default unless you need very focused output</td></tr>
+      <tr><td><code>stop_sequences</code></td><td>List of strings</td><td>Stop generating when seen</td><td><code>["###", "END"]</code> for structured parsing</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<hr>
+
+<!-- ══════ 02 SYSTEM PROMPTS ══════ -->
+<div class="section" id="system">
+  <div class="section-head">
+    <div class="s-num c2">02</div>
+    <div class="s-head-text">
+      <h2>SYSTEM PROMPTS — DEFINING AGENT PERSONA</h2>
+      <p>Shape the model's identity, constraints, and output format before any user message</p>
+    </div>
+  </div>
+
+  <div class="why blue">
+    <div class="why-label">↳ Why System Prompts Are Architecturally Different</div>
+    <p>A system prompt is not just "message number zero." It's passed in a separate <code>system_instruction</code> parameter and processed differently by Gemini — it has higher weight and is not easily overridden by user messages. This is what lets you say "always respond in JSON" or "never discuss competitors" and have it hold across a long conversation. For your hackathon agents, the system prompt IS the agent's specification — it defines exactly what kind of intelligence it has.</p>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-label"><span class="cl-dot cl-b"></span>02_system_prompts.py — freight intelligence agent persona</div>
+    <pre><span class="kw">import</span> os, json
+<span class="kw">import</span> google.generativeai <span class="kw">as</span> genai
+<span class="kw">from</span> dotenv <span class="kw">import</span> load_dotenv
+
+load_dotenv()
+genai.<span class="fn">configure</span>(api_key=os.<span class="fn">getenv</span>(<span class="st">"GEMINI_API_KEY"</span>))
+
+<span class="cm"># ── Your hackathon agent's persona ──</span>
+<span class="cm"># This is the "constitution" — write it precisely</span>
+CARGO_AGENT_SYSTEM = <span class="st">"""
+You are CargoSense, a freight intelligence agent specialised
+in Pakistani import and export operations.
+
+Your expertise:
+- Maritime shipping routes: Suez Canal, Strait of Hormuz, Cape of Good Hope
+- Pakistani regulatory environment: FBR, NEPRA, SBP, customs procedures
+- Currency: Always provide costs in both USD and PKR (current rate ~278 PKR/USD)
+- Risk assessment: Always provide a risk score 1-10 for shipping routes
+  (1=minimal risk, 10=critical/avoid)
+
+Response format:
+- Lead with the risk score: "Risk Score: X/10"
+- Follow with a 2-3 sentence summary
+- End with "Key Action:" — one specific recommendation
+- Always cite the source of information (news, regulatory, market data)
+
+Constraints:
+- Never speculate without flagging it: prefix uncertain info with "[ESTIMATE]"
+- If asked about something outside shipping/trade, redirect politely
+- Always consider PKR currency implications for Pakistani importers
+"""</span>
+
+<span class="hl-g"><span class="cm"># ── system_instruction is separate from user messages ──</span>
+model = genai.<span class="cl">GenerativeModel</span>(
+    <span class="st">"gemini-1.5-flash"</span>,
+    system_instruction=CARGO_AGENT_SYSTEM
+)</span>
+
+<span class="cm"># ── Now every call carries this persona ──</span>
+response = model.<span class="fn">generate_content</span>(
+    <span class="st">"What is the current risk of shipping electronics from China "
+    "to Karachi via the Suez Canal?"</span>
+)
+print(response.text)
+
+<span class="cm"># ── Different agents — same pattern, different system prompts ──</span>
+
+FX_ADVISOR_SYSTEM = <span class="st">"""
+You are FX Advisor, a foreign exchange specialist for Pakistani importers.
+Always provide PKR/USD, PKR/EUR, PKR/CNY rates with context.
+Format every response as JSON with keys: rates, trend, recommendation, risk_level.
+"""</span>
+
+LC_AGENT_SYSTEM = <span class="st">"""
+You are an LC Compliance Specialist.
+You interpret Letters of Credit and UCP 600 rules for Pakistani traders.
+Always cite the specific UCP 600 article number when referencing rules.
+Flag any discrepancy with "⚠️ DISCREPANCY:" prefix.
+"""</span></pre>
+  </div>
+
+  <div class="alert alert-info">
+    <span class="alert-icon">ℹ️</span>
+    <div class="alert-body">
+      <strong>System Prompt Engineering Tips</strong>
+      <p>Be <em>specific</em> about output format — Gemini follows formatting instructions reliably. Use verbs: "Always", "Never", "Format as", "Cite". Include examples of desired output inside the system prompt itself. The more precise your system prompt, the more consistent your agent's behaviour across thousands of user messages.</p>
+    </div>
+  </div>
+</div>
+
+<hr>
+
+<!-- ══════ 03 MULTI-TURN ══════ -->
+<div class="section" id="multiturn">
+  <div class="section-head">
+    <div class="s-num c3">03</div>
+    <div class="s-head-text">
+      <h2>MULTI-TURN CONVERSATIONS — BUILDING MEMORY</h2>
+      <p>Tasks 14 & 16 — The history list IS the memory. You own it. You manage it.</p>
+    </div>
+  </div>
+
+  <div class="why gold">
+    <div class="why-label">↳ Why You Manage History Yourself</div>
+    <p>Gemini has no server-side session. Every API call is a fresh request. The SDK's <code>ChatSession</code> object is just a Python list that appends messages for you — it's not a persistent connection. This is actually powerful: you can <strong>inspect, modify, summarise, or truncate</strong> the history at any point. When history gets long, you can summarise old messages to save tokens. This is how your Streamlit app maintains context — it's just a list in your Python process.</p>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-label"><span class="cl-dot cl-gold"></span>03_multiturn.py — Task 14 — chat loop with history</div>
+    <pre><span class="kw">import</span> os
+<span class="kw">import</span> google.generativeai <span class="kw">as</span> genai
+<span class="kw">from</span> dotenv <span class="kw">import</span> load_dotenv
+
+load_dotenv()
+genai.<span class="fn">configure</span>(api_key=os.<span class="fn">getenv</span>(<span class="st">"GEMINI_API_KEY"</span>))
+
+SYSTEM = <span class="st">"""You are CargoSense, a freight intelligence agent for
+Pakistani importers. Maintain context across the conversation."""</span>
+
+model = genai.<span class="cl">GenerativeModel</span>(<span class="st">"gemini-1.5-flash"</span>, system_instruction=SYSTEM)
+
+<span class="cm"># ── start_chat() creates a ChatSession with an empty history list ──</span>
+<span class="hl-gold">chat = model.<span class="fn">start_chat</span>(history=[])</span>
+
+print(<span class="st">"CargoSense Agent (type 'quit' to exit)\n"</span>)
+
+<span class="kw">while</span> <span class="kw">True</span>:
+    user_input = <span class="fn">input</span>(<span class="st">"You: "</span>)
+    <span class="kw">if</span> user_input.lower() == <span class="st">"quit"</span>:
+        <span class="kw">break</span>
+
+    <span class="cm"># ── send_message() appends user msg, calls API with full history,</span>
+    <span class="cm">#    appends model response — all in one call ──</span>
+    <span class="hl-gold">    response = chat.<span class="fn">send_message</span>(user_input)</span>
+    print(<span class="st">f"\nCargoSense: {response.text}\n"</span>)
+
+    <span class="cm"># ── Inspect the history at any time ──</span>
+    <span class="cm"># chat.history → list of Content objects</span>
+    <span class="cm"># Each item has .role ("user" or "model") and .parts (text/image)</span>
+    print(<span class="st">f"  [History length: {len(chat.history)} messages, "</span>
+          <span class="st">f"~{sum(len(str(m)) for m in chat.history)} chars]"</span>)
+
+<span class="cm"># ── The history after a conversation ──</span>
+print(<span class="st">"\n--- Full Conversation History ---"</span>)
+<span class="kw">for</span> msg <span class="kw">in</span> chat.history:
+    role = msg.role.upper()
+    text = msg.parts[<span class="nm">0</span>].text[:<span class="nm">100</span>]  <span class="cm"># first 100 chars</span>
+    print(<span class="st">f"[{role}]: {text}..."</span>)</pre>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-label"><span class="cl-dot cl-gold"></span>03b_streamlit_chat.py — multi-turn in a Streamlit UI</div>
+    <pre><span class="kw">import</span> os
+<span class="kw">import</span> streamlit <span class="kw">as</span> st
+<span class="kw">import</span> google.generativeai <span class="kw">as</span> genai
+<span class="kw">from</span> dotenv <span class="kw">import</span> load_dotenv
+
+load_dotenv()
+genai.<span class="fn">configure</span>(api_key=os.<span class="fn">getenv</span>(<span class="st">"GEMINI_API_KEY"</span>))
+
+SYSTEM = <span class="st">"You are CargoSense, a freight intelligence agent for Pakistani importers."</span>
+
+<span class="cm"># ── st.session_state persists across Streamlit rerenders ──</span>
+<span class="cm"># This is Streamlit's equivalent of a Python variable that survives page refresh</span>
+<span class="hl-gold"><span class="kw">if</span> <span class="st">"chat"</span> <span class="kw">not in</span> st.session_state:
+    model = genai.<span class="cl">GenerativeModel</span>(<span class="st">"gemini-1.5-flash"</span>, system_instruction=SYSTEM)
+    st.session_state.chat = model.<span class="fn">start_chat</span>(history=[])
+
+<span class="kw">if</span> <span class="st">"messages"</span> <span class="kw">not in</span> st.session_state:
+    st.session_state.messages = []  <span class="cm"># for display only</span></span>
+
+st.title(<span class="st">"🚢 CargoSense — Freight Intelligence"</span>)
+
+<span class="cm"># ── Display past messages ──</span>
+<span class="kw">for</span> msg <span class="kw">in</span> st.session_state.messages:
+    <span class="kw">with</span> st.<span class="fn">chat_message</span>(msg[<span class="st">"role"</span>]):
+        st.<span class="fn">markdown</span>(msg[<span class="st">"content"</span>])
+
+<span class="cm"># ── Accept new input ──</span>
+<span class="kw">if</span> prompt := st.<span class="fn">chat_input</span>(<span class="st">"Ask about shipping, FX rates, customs..."</span>):
+    st.session_state.messages.<span class="fn">append</span>({<span class="st">"role"</span>: <span class="st">"user"</span>, <span class="st">"content"</span>: prompt})
+    <span class="kw">with</span> st.<span class="fn">chat_message</span>(<span class="st">"user"</span>):
+        st.<span class="fn">markdown</span>(prompt)
+
+    <span class="kw">with</span> st.<span class="fn">chat_message</span>(<span class="st">"assistant"</span>):
+        <span class="cm"># ── chat object carries full history automatically ──</span>
+        response = st.session_state.chat.<span class="fn">send_message</span>(prompt)
+        st.<span class="fn">markdown</span>(response.text)
+        st.session_state.messages.<span class="fn">append</span>({<span class="st">"role"</span>: <span class="st">"assistant"</span>, <span class="st">"content"</span>: response.text})</pre>
+  </div>
+</div>
+
+<hr>
+
+<!-- ══════ 04 FUNCTION CALLING ══════ -->
+<div class="section" id="tools">
+  <div class="section-head">
+    <div class="s-num c4">04</div>
+    <div class="s-head-text">
+      <h2>FUNCTION / TOOL CALLING — THE AGENT ENGINE</h2>
+      <p>Tasks 15 & 16 — Define Python functions, let Gemini decide when to call them</p>
+    </div>
+  </div>
+
+  <div class="why purple">
+    <div class="why-label">↳ Why This Is the Core of Every Hackathon Agent</div>
+    <p>Without function calling, Gemini can only answer from its training data — frozen knowledge with a cutoff date. With function calling, Gemini becomes a <strong>reasoning engine that can take actions</strong>: fetch live FX rates, query your MongoDB, call NewsAPI, look up shipping schedules. The key insight: Gemini doesn't execute your function. It <em>requests</em> it by returning a structured JSON object saying "call <code>get_exchange_rate</code> with <code>{"currency": "PKR"}</code>". Your code catches that, runs the function, and feeds the result back. Gemini then writes the final answer incorporating the live data.</p>
+  </div>
+
+  <div class="flow">
+    <div class="flow-box fb-c"><div class="fb-label">User</div><div class="fb-name">"PKR rate?"</div></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box fb-p"><div class="fb-label">Gemini</div><div class="fb-name">Call request</div></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box fb-gold"><div class="fb-label">Your Code</div><div class="fb-name">Executes fn</div></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box fb-p"><div class="fb-label">Gemini</div><div class="fb-name">Reads result</div></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box fb-g"><div class="fb-label">User</div><div class="fb-name">Final answer</div></div>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-label"><span class="cl-dot cl-p"></span>04_function_calling.py — Task 15 & 16 — FX Advisor mini agent</div>
+    <pre><span class="kw">import</span> os, json
+<span class="kw">import</span> google.generativeai <span class="kw">as</span> genai
+<span class="kw">from</span> dotenv <span class="kw">import</span> load_dotenv
+
+load_dotenv()
+genai.<span class="fn">configure</span>(api_key=os.<span class="fn">getenv</span>(<span class="st">"GEMINI_API_KEY"</span>))
+
+<span class="cm"># ════════════════════════════════════════════════
+# STEP 1 — Define your actual Python functions
+# These do real work (or fake it for testing)
+# ════════════════════════════════════════════════</span>
+
+<span class="kw">def</span> <span class="fn">get_exchange_rate</span>(base_currency: str, target_currency: str) -> dict:
+    <span class="cm">"""
+    Get the current exchange rate between two currencies.
+    In production: call exchangerate-api.com or State Bank of Pakistan API.
+    For testing: return hardcoded values.
+    """</span>
+    <span class="cm"># Replace with real API call in production</span>
+    rates = {
+        (<span class="st">"USD"</span>, <span class="st">"PKR"</span>): <span class="nm">278.50</span>,
+        (<span class="st">"EUR"</span>, <span class="st">"PKR"</span>): <span class="nm">301.20</span>,
+        (<span class="st">"CNY"</span>, <span class="st">"PKR"</span>): <span class="nm">38.45</span>,
+        (<span class="st">"PKR"</span>, <span class="st">"USD"</span>): <span class="nm">0.003591</span>,
+    }
+    rate = rates.<span class="fn">get</span>((base_currency.upper(), target_currency.upper()))
+    <span class="kw">return</span> {
+        <span class="st">"base"</span>: base_currency,
+        <span class="st">"target"</span>: target_currency,
+        <span class="st">"rate"</span>: rate,
+        <span class="st">"timestamp"</span>: <span class="st">"2025-05-03T10:00:00Z"</span>,
+        <span class="st">"source"</span>: <span class="st">"State Bank of Pakistan"</span>
+    }
+
+<span class="kw">def</span> <span class="fn">get_shipping_risk</span>(route: str, cargo_type: str) -> dict:
+    <span class="cm">"""Get risk score for a shipping route."""</span>
+    risks = {
+        <span class="st">"suez"</span>: {<span class="st">"score"</span>: <span class="nm">8</span>, <span class="st">"reason"</span>: <span class="st">"Houthi attacks ongoing"</span>},
+        <span class="st">"hormuz"</span>: {<span class="st">"score"</span>: <span class="nm">6</span>, <span class="st">"reason"</span>: <span class="st">"US/Iran tensions"</span>},
+        <span class="st">"cape"</span>: {<span class="st">"score"</span>: <span class="nm">2</span>, <span class="st">"reason"</span>: <span class="st">"Longer but safer reroute"</span>},
+    }
+    r = risks.<span class="fn">get</span>(route.lower(), {<span class="st">"score"</span>: <span class="nm">5</span>, <span class="st">"reason"</span>: <span class="st">"Unknown route"</span>})
+    <span class="kw">return</span> {<span class="st">"route"</span>: route, <span class="st">"cargo"</span>: cargo_type, **r}
+
+
+<span class="cm"># ════════════════════════════════════════════════
+# STEP 2 — Declare function schemas for Gemini
+# This tells Gemini WHAT the functions do and
+# what parameters they accept. Plain Python dicts.
+# ════════════════════════════════════════════════</span>
+
+<span class="hl-p">get_exchange_rate_tool = {
+    <span class="st">"name"</span>: <span class="st">"get_exchange_rate"</span>,
+    <span class="st">"description"</span>: (
+        <span class="st">"Get the current exchange rate between two currencies. "</span>
+        <span class="st">"Use when the user asks about currency rates, FX, "</span>
+        <span class="st">"how much something costs in PKR, or conversion."</span>
+    ),
+    <span class="st">"parameters"</span>: {
+        <span class="st">"type"</span>: <span class="st">"object"</span>,
+        <span class="st">"properties"</span>: {
+            <span class="st">"base_currency"</span>: {
+                <span class="st">"type"</span>: <span class="st">"string"</span>,
+                <span class="st">"description"</span>: <span class="st">"The source currency code, e.g. USD, EUR, CNY"</span>
+            },
+            <span class="st">"target_currency"</span>: {
+                <span class="st">"type"</span>: <span class="st">"string"</span>,
+                <span class="st">"description"</span>: <span class="st">"The target currency code, e.g. PKR"</span>
+            }
+        },
+        <span class="st">"required"</span>: [<span class="st">"base_currency"</span>, <span class="st">"target_currency"</span>]
+    }
+}</span>
+
+get_shipping_risk_tool = {
+    <span class="st">"name"</span>: <span class="st">"get_shipping_risk"</span>,
+    <span class="st">"description"</span>: <span class="st">"Get risk score and reason for a shipping route"</span>,
+    <span class="st">"parameters"</span>: {
+        <span class="st">"type"</span>: <span class="st">"object"</span>,
+        <span class="st">"properties"</span>: {
+            <span class="st">"route"</span>:      {<span class="st">"type"</span>: <span class="st">"string"</span>, <span class="st">"description"</span>: <span class="st">"Route name: suez, hormuz, or cape"</span>},
+            <span class="st">"cargo_type"</span>: {<span class="st">"type"</span>: <span class="st">"string"</span>, <span class="st">"description"</span>: <span class="st">"Type of cargo being shipped"</span>}
+        },
+        <span class="st">"required"</span>: [<span class="st">"route"</span>]
+    }
+}
+
+
+<span class="cm"># ════════════════════════════════════════════════
+# STEP 3 — Pass tools to the model
+# ════════════════════════════════════════════════</span>
+
+<span class="hl-p">model = genai.<span class="cl">GenerativeModel</span>(
+    <span class="st">"gemini-1.5-flash"</span>,
+    system_instruction=<span class="st">"You are an FX and shipping advisor for Pakistani importers."</span>,
+    tools=[get_exchange_rate_tool, get_shipping_risk_tool]
+)</span>
+
+<span class="cm"># ── Function dispatcher — maps name strings to actual functions ──</span>
+FUNCTION_MAP = {
+    <span class="st">"get_exchange_rate"</span>: get_exchange_rate,
+    <span class="st">"get_shipping_risk"</span>: get_shipping_risk,
+}
+
+<span class="kw">def</span> <span class="fn">chat_with_tools</span>(user_message: str) -> str:
+    <span class="cm">"""
+    Full function-calling loop:
+    1. Send user message
+    2. If Gemini wants to call a function → call it
+    3. Send function result back → get final answer
+    """</span>
+    chat = model.<span class="fn">start_chat</span>()
+    response = chat.<span class="fn">send_message</span>(user_message)
+
+    <span class="cm"># ── Check if Gemini wants to call a function ──</span>
+    <span class="kw">while</span> response.candidates[<span class="nm">0</span>].finish_reason.name == <span class="st">"TOOL_CALLS"</span>:
+        <span class="cm"># Extract the function call request</span>
+        fn_call = response.candidates[<span class="nm">0</span>].content.parts[<span class="nm">0</span>].function_call
+        fn_name = fn_call.name
+        fn_args = dict(fn_call.args)
+
+        print(<span class="st">f"  🔧 Gemini calling: {fn_name}({fn_args})"</span>)
+
+        <span class="cm"># ── Execute the actual Python function ──</span>
+        result = FUNCTION_MAP[fn_name](**fn_args)
+        print(<span class="st">f"  📊 Result: {result}"</span>)
+
+        <span class="cm"># ── Send function result back to Gemini ──</span>
+        response = chat.<span class="fn">send_message</span>(
+            genai.<span class="cl">protos</span>.<span class="cl">Part</span>(
+                function_response=genai.<span class="cl">protos</span>.<span class="cl">FunctionResponse</span>(
+                    name=fn_name,
+                    response={<span class="st">"result"</span>: result}
+                )
+            )
+        )
+
+    <span class="kw">return</span> response.text
+
+
+<span class="cm"># ── Test it ──</span>
+<span class="kw">if</span> __name__ == <span class="st">"__main__"</span>:
+    <span class="cm"># This should trigger get_exchange_rate automatically</span>
+    print(<span class="fn">chat_with_tools</span>(<span class="st">"I want to import $50,000 worth of electronics. What's that in PKR?"</span>))
+    print()
+    <span class="cm"># This should trigger get_shipping_risk</span>
+    print(<span class="fn">chat_with_tools</span>(<span class="st">"Is it safe to ship through Suez right now?"</span>))
+    print()
+    <span class="cm"># This should trigger BOTH tools</span>
+    print(<span class="fn">chat_with_tools</span>(<span class="st">"I'm shipping electronics worth 100,000 USD via Suez. What's my total risk in PKR terms?"</span>))</pre>
+  </div>
+
+  <div class="alert alert-info">
+    <span class="alert-icon">ℹ️</span>
+    <div class="alert-body">
+      <strong>The description field is everything</strong>
+      <p>Gemini decides WHICH function to call — and WHETHER to call one at all — based entirely on the <code>description</code> field you write. "Get exchange rate" is vague. "Get the current exchange rate between two currencies. Use when the user asks about currency rates, FX, how much something costs in PKR, or conversion" is precise. Write descriptions as if explaining to a smart intern when to use the tool.</p>
+    </div>
+  </div>
+</div>
+
+<hr>
+
+<!-- ══════ 05 MULTIMODAL ══════ -->
+<div class="section" id="multimodal">
+  <div class="section-head">
+    <div class="s-num c5">05</div>
+    <div class="s-head-text">
+      <h2>MULTIMODAL INPUT — IMAGES AND TEXT TOGETHER</h2>
+      <p>LC Compliance Agent (read PDFs) and Car Negotiation Agent (analyse photos)</p>
+    </div>
+  </div>
+
+  <div class="why teal">
+    <div class="why-label">↳ Why Multimodal Is a Hackathon Superpower</div>
+    <p>Most AI demos are text-only. The moment you drop in an image — a car photo, a PDF page, a shipping document — your demo stands out. For your LC Compliance Agent, instead of building a complex PDF parser, you can render each page as an image and send it directly to Gemini with "extract all the terms and conditions." For the Car Negotiation Agent, the user uploads a photo and asks "what damage can you see and how does it affect the price?" That's a feature no text-only agent can match.</p>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-label"><span class="cl-dot cl-t"></span>05_multimodal.py — images and PDFs with Gemini</div>
+    <pre><span class="kw">import</span> os
+<span class="kw">from</span> pathlib <span class="kw">import</span> Path
+<span class="kw">import</span> google.generativeai <span class="kw">as</span> genai
+<span class="kw">from</span> dotenv <span class="kw">import</span> load_dotenv
+<span class="kw">import</span> PIL.Image        <span class="cm"># pip install Pillow</span>
+<span class="kw">import</span> fitz             <span class="cm"># pip install PyMuPDF — PDF to image</span>
+
+load_dotenv()
+genai.<span class="fn">configure</span>(api_key=os.<span class="fn">getenv</span>(<span class="st">"GEMINI_API_KEY"</span>))
+
+model = genai.<span class="cl">GenerativeModel</span>(<span class="st">"gemini-1.5-flash"</span>)
+
+
+<span class="cm"># ════════════════════════════════════════════
+# PATTERN 1 — Single image from file
+# Use case: Car Negotiation Agent
+# ════════════════════════════════════════════</span>
+<span class="kw">def</span> <span class="fn">analyze_car_image</span>(image_path: str) -> str:
+    image = PIL.Image.<span class="fn">open</span>(image_path)
+
+    <span class="cm"># ── contents list mixes text and image ──</span>
+    <span class="hl">    response = model.<span class="fn">generate_content</span>([
+        image,  <span class="cm"># PIL image object</span>
+        <span class="st">"You are a car inspection expert in Pakistan. "
+        "Analyse this car photo and: "
+        "1. List all visible damage with severity (minor/moderate/major). "
+        "2. Estimate repair cost in PKR for each issue. "
+        "3. Recommend a negotiation discount percentage off the asking price."</span>
+    ])</span>
+    <span class="kw">return</span> response.text
+
+
+<span class="cm"># ════════════════════════════════════════════
+# PATTERN 2 — Image from bytes (for Streamlit uploads)
+# ════════════════════════════════════════════</span>
+<span class="kw">def</span> <span class="fn">analyze_uploaded_image</span>(image_bytes: bytes, mime_type: str, prompt: str) -> str:
+    <span class="cm"># For Streamlit: st.file_uploader returns bytes via .read()</span>
+    image_part = {
+        <span class="st">"mime_type"</span>: mime_type,  <span class="cm"># "image/jpeg", "image/png", "image/webp"</span>
+        <span class="st">"data"</span>: image_bytes
+    }
+    <span class="hl">    response = model.<span class="fn">generate_content</span>([image_part, prompt])</span>
+    <span class="kw">return</span> response.text
+
+
+<span class="cm"># ════════════════════════════════════════════
+# PATTERN 3 — PDF pages as images
+# Use case: LC Compliance Agent
+# ════════════════════════════════════════════</span>
+<span class="kw">def</span> <span class="fn">analyze_lc_document</span>(pdf_path: str) -> list[dict]:
+    <span class="cm">"""
+    Convert each PDF page to an image, send to Gemini.
+    Returns list of per-page analysis results.
+    """</span>
+    doc = fitz.<span class="fn">open</span>(pdf_path)
+    results = []
+
+    <span class="kw">for</span> page_num <span class="kw">in</span> range(len(doc)):
+        page = doc[page_num]
+        <span class="cm"># Render at 2x zoom for better OCR accuracy</span>
+        mat  = fitz.<span class="cl">Matrix</span>(<span class="nm">2.0</span>, <span class="nm">2.0</span>)
+        pix  = page.<span class="fn">get_pixmap</span>(matrix=mat)
+        img_bytes = pix.<span class="fn">tobytes</span>(<span class="st">"png"</span>)
+
+        image_part = {<span class="st">"mime_type"</span>: <span class="st">"image/png"</span>, <span class="st">"data"</span>: img_bytes}
+
+        <span class="hl">        response = model.<span class="fn">generate_content</span>([
+            image_part,
+            <span class="st">f"This is page {page_num+1} of a Letter of Credit document. "
+            <span class="st">"Extract: applicant, beneficiary, amount, expiry date, "
+            "required documents, and any non-standard conditions. "
+            "Flag any UCP 600 compliance issues with ⚠️."</span>
+        ])</span>
+        results.<span class="fn">append</span>({
+            <span class="st">"page"</span>: page_num + <span class="nm">1</span>,
+            <span class="st">"analysis"</span>: response.text
+        })
+
+    <span class="kw">return</span> results
+
+
+<span class="cm"># ════════════════════════════════════════════
+# PATTERN 4 — Multiple images in one call
+# Use case: Compare before/after, multiple docs
+# ════════════════════════════════════════════</span>
+<span class="kw">def</span> <span class="fn">compare_documents</span>(image1_path: str, image2_path: str) -> str:
+    img1 = PIL.Image.<span class="fn">open</span>(image1_path)
+    img2 = PIL.Image.<span class="fn">open</span>(image2_path)
+
+    <span class="hl">    response = model.<span class="fn">generate_content</span>([
+        <span class="st">"Compare these two documents:"</span>,
+        img1,
+        <span class="st">"versus:"</span>,
+        img2,
+        <span class="st">"Identify all discrepancies between them."</span>
+    ])</span>
+    <span class="kw">return</span> response.text</pre>
+  </div>
+</div>
+
+<hr>
+
+<!-- ══════ 06 STREAMING ══════ -->
+<div class="section" id="streaming">
+  <div class="section-head">
+    <div class="s-num c6">06</div>
+    <div class="s-head-text">
+      <h2>STREAMING RESPONSES — TOKEN BY TOKEN</h2>
+      <p>Task 17 — Print tokens as they arrive. Transforms perceived UX.</p>
+    </div>
+  </div>
+
+  <div class="why green">
+    <div class="why-label">↳ Why Streaming Changes the Demo Experience</div>
+    <p>Without streaming, your UI shows a loading spinner for 3–8 seconds, then the full response appears at once. With streaming, the user sees text appearing immediately — like the agent is thinking in real time. For a hackathon demo to judges, this difference is enormous. It signals that your system is responsive and alive. Streaming is one line of code to add — the payoff in demo quality is disproportionate.</p>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-label"><span class="cl-dot cl-g"></span>06_streaming.py — Task 17 — stream tokens to terminal</div>
+    <pre><span class="kw">import</span> os, sys
+<span class="kw">import</span> google.generativeai <span class="kw">as</span> genai
+<span class="kw">from</span> dotenv <span class="kw">import</span> load_dotenv
+
+load_dotenv()
+genai.<span class="fn">configure</span>(api_key=os.<span class="fn">getenv</span>(<span class="st">"GEMINI_API_KEY"</span>))
+model = genai.<span class="cl">GenerativeModel</span>(<span class="st">"gemini-1.5-flash"</span>)
+
+<span class="cm"># ── The only difference: stream=True ──</span>
+<span class="hl-g">response_stream = model.<span class="fn">generate_content</span>(
+    <span class="st">"Write a 3-paragraph risk report on importing auto parts from China to Karachi."</span>,
+    stream=<span class="kw">True</span>  <span class="cm"># ← this one parameter enables streaming</span>
+)</span>
+
+print(<span class="st">"Streaming response:\n"</span>)
+
+<span class="cm"># ── Iterate over chunks as they arrive ──</span>
+full_text = <span class="st">""</span>
+<span class="hl-g"><span class="kw">for</span> chunk <span class="kw">in</span> response_stream:
+    <span class="kw">if</span> chunk.text:
+        print(chunk.text, end=<span class="st">""</span>, flush=<span class="kw">True</span>)  <span class="cm"># flush=True is critical</span>
+        full_text += chunk.text</span>
+
+print(<span class="st">"\n\n--- Stream complete ---"</span>)
+print(<span class="st">f"Total characters: {len(full_text)}"</span>)
+
+
+<span class="cm"># ── Streaming in a chat session ──</span>
+chat = model.<span class="fn">start_chat</span>()
+response_stream = chat.<span class="fn">send_message</span>(
+    <span class="st">"What are the top 5 customs duties on electronics imports to Pakistan?"</span>,
+    stream=<span class="kw">True</span>
+)
+<span class="kw">for</span> chunk <span class="kw">in</span> response_stream:
+    print(chunk.text, end=<span class="st">""</span>, flush=<span class="kw">True</span>)</pre>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-label"><span class="cl-dot cl-g"></span>06b_streamlit_streaming.py — stream into Streamlit UI</div>
+    <pre><span class="kw">import</span> os
+<span class="kw">import</span> streamlit <span class="kw">as</span> st
+<span class="kw">import</span> google.generativeai <span class="kw">as</span> genai
+<span class="kw">from</span> dotenv <span class="kw">import</span> load_dotenv
+
+load_dotenv()
+genai.<span class="fn">configure</span>(api_key=os.<span class="fn">getenv</span>(<span class="st">"GEMINI_API_KEY"</span>))
+
+<span class="kw">if</span> <span class="st">"chat"</span> <span class="kw">not in</span> st.session_state:
+    model = genai.<span class="cl">GenerativeModel</span>(<span class="st">"gemini-1.5-flash"</span>)
+    st.session_state.chat = model.<span class="fn">start_chat</span>()
+
+<span class="kw">if</span> prompt := st.<span class="fn">chat_input</span>(<span class="st">"Ask CargoSense anything..."</span>):
+    <span class="kw">with</span> st.<span class="fn">chat_message</span>(<span class="st">"assistant"</span>):
+        <span class="cm"># ── st.write_stream handles the generator automatically ──</span>
+        <span class="cm"># Pass the stream directly — Streamlit iterates and displays chunks</span>
+        <span class="hl-g">        response = st.session_state.chat.<span class="fn">send_message</span>(prompt, stream=<span class="kw">True</span>)
+        full_response = st.<span class="fn">write_stream</span>(
+            chunk.text <span class="kw">for</span> chunk <span class="kw">in</span> response <span class="kw">if</span> chunk.text
+        )</span></pre>
+  </div>
+</div>
+
+<hr>
+
+<!-- ══════ HANDS-ON TASKS ══════ -->
+<div class="section" id="tasks">
+  <div class="section-head">
+    <div class="s-num c1">✓</div>
+    <div class="s-head-text">
+      <h2>HANDS-ON TASKS — COMPLETION CHECKLIST</h2>
+      <p>Tasks 12–17 mapped to code, in order</p>
+    </div>
+  </div>
+
+  <div class="steps">
+    <div class="step">
+      <span class="step-n" style="color:var(--gem-cyan);">12</span>
+      <div class="step-body">
+        <strong>Get API Key from AI Studio</strong>
+        <p>Go to <code>aistudio.google.com</code> → Get API Key → Create. Copy to <code>.env</code> as <code>GEMINI_API_KEY=AIza...</code>. Install: <code>pip install google-generativeai python-dotenv</code>.</p>
+      </div>
+    </div>
+    <div class="step">
+      <span class="step-n" style="color:var(--gem-cyan);">13</span>
+      <div class="step-body">
+        <strong>Python Quickstart — Working Response in 5 Minutes</strong>
+        <p>Run <code>01_text_generation.py</code> from this guide. Confirm you see output text + token count. Try changing <code>temperature</code> from <code>0.0</code> to <code>1.0</code> and observe how the output changes.</p>
+      </div>
+    </div>
+    <div class="step">
+      <span class="step-n" style="color:var(--gem-cyan);">14</span>
+      <div class="step-body">
+        <strong>Multi-Turn Chat Loop with History</strong>
+        <p>Run <code>03_multiturn.py</code>. Have a 5-message conversation. Then run it again — confirm it starts fresh (stateless). Check <code>chat.history</code> and understand its structure.</p>
+      </div>
+    </div>
+    <div class="step">
+      <span class="step-n" style="color:var(--gem-cyan);">15</span>
+      <div class="step-body">
+        <strong>Define get_exchange_rate as a Gemini Tool</strong>
+        <p>Run <code>04_function_calling.py</code>. Ask "What's the USD to PKR rate?" — confirm Gemini calls <code>get_exchange_rate</code> automatically and prints the tool call in the console.</p>
+      </div>
+    </div>
+    <div class="step">
+      <span class="step-n" style="color:var(--gem-cyan);">16</span>
+      <div class="step-body">
+        <strong>FX Advisor Mini-Agent</strong>
+        <p>Run the FX advisor test in <code>04_function_calling.py</code>. Try "I'm importing $50,000 of goods, how much is that in PKR?" — Gemini should call the function, get the rate, and return a recommendation without you writing any calculation code.</p>
+      </div>
+    </div>
+    <div class="step">
+      <span class="step-n" style="color:var(--gem-cyan);">17</span>
+      <div class="step-body">
+        <strong>Test Streaming — Print Tokens in Real Time</strong>
+        <p>Run <code>06_streaming.py</code>. Watch tokens appear one by one. Then run the Streamlit version (<code>streamlit run 06b_streamlit_streaming.py</code>) and watch the UI update in real time.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="alert alert-ok">
+    <span class="alert-icon">✅</span>
+    <div class="alert-body">
+      <strong>You're ready to build agents when:</strong>
+      <p>You can write a system prompt → start a chat → send a message → receive a tool call response → execute the function → send the result back → receive the final answer. That loop is the complete architecture of every agent in your hackathon plan.</p>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<footer>
+  Gemini API Complete Guide &nbsp;·&nbsp; <strong>Agentic AI Hackathon 2026</strong> &nbsp;·&nbsp; Text · System Prompts · Multi-Turn · Tool Calling · Multimodal · Streaming
+</footer>
+</body>
+</html>

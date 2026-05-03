@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vertex AI — Complete Developer Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:        #080a10;
+  --surface:   #0c0f18;
+  --card:      #101422;
+  --raised:    #141929;
+  --border:    #1c2238;
+  --border2:   #242d47;
+  --v-blue:    #4285f4;
+  --v-indigo:  #5c6bc0;
+  --v-cyan:    #00bcd4;
+  --v-purple:  #7c4dff;
+  --v-green:   #00897b;
+  --v-amber:   #ffb300;
+  --v-red:     #e53935;
+  --v-pink:    #e91e63;
+  --text:      #c5cce8;
+  --text-dim:  #4a5580;
+  --white:     #edf0f8;
+  --code-bg:   #050710;
+  --mono: 'IBM Plex Mono', monospace;
+  --sans: 'DM Sans', sans-serif;
+  --display: 'Bebas Neue', sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:15px;line-height:1.7;}
+
+body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.08) 2px,rgba(0,0,0,.08) 4px);pointer-events:none;z-index:9999;}
+
+header{background:linear-gradient(160deg,#090c18 0%,#080a10 60%);border-bottom:1px solid var(--border);padding:56px 48px 44px;position:relative;overflow:hidden;}
+header::after{content:'';position:absolute;right:-80px;top:-80px;width:440px;height:440px;background:radial-gradient(circle,rgba(92,107,192,.1) 0%,transparent 70%);pointer-events:none;}
+header::before{content:'';position:absolute;left:30%;bottom:-60px;width:350px;height:350px;background:radial-gradient(circle,rgba(124,77,255,.07) 0%,transparent 70%);pointer-events:none;}
+.h-eyebrow{font-family:var(--mono);font-size:10px;letter-spacing:3px;color:var(--v-indigo);text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:10px;}
+.h-eyebrow::before{content:'';width:24px;height:1px;background:var(--v-indigo);}
+header h1{font-family:var(--display);font-size:clamp(38px,5vw,72px);letter-spacing:2px;color:var(--white);line-height:1;margin-bottom:16px;}
+header h1 em{color:var(--v-purple);font-style:normal;}
+.h-sub{color:var(--text-dim);font-size:14px;max-width:640px;line-height:1.6;margin-bottom:28px;}
+.h-tags{display:flex;flex-wrap:wrap;gap:8px;}
+.tag{font-family:var(--mono);font-size:10px;letter-spacing:.5px;padding:4px 11px;border-radius:3px;border:1px solid;}
+.tag-b{color:var(--v-blue);border-color:rgba(66,133,244,.3);background:rgba(66,133,244,.07);}
+.tag-p{color:var(--v-purple);border-color:rgba(124,77,255,.3);background:rgba(124,77,255,.07);}
+.tag-c{color:var(--v-cyan);border-color:rgba(0,188,212,.3);background:rgba(0,188,212,.07);}
+.tag-g{color:var(--v-green);border-color:rgba(0,137,123,.3);background:rgba(0,137,123,.07);}
+.tag-a{color:var(--v-amber);border-color:rgba(255,179,0,.3);background:rgba(255,179,0,.07);}
+.tag-i{color:var(--v-indigo);border-color:rgba(92,107,192,.3);background:rgba(92,107,192,.07);}
+
+nav{background:var(--surface);border-bottom:1px solid var(--border);padding:0 48px;display:flex;gap:0;overflow-x:auto;}
+nav a{font-family:var(--mono);font-size:11px;letter-spacing:.5px;color:var(--text-dim);text-decoration:none;padding:14px 20px;border-bottom:2px solid transparent;white-space:nowrap;transition:all .2s;}
+nav a:hover{color:var(--white);border-color:var(--v-purple);}
+
+main{max-width:1000px;margin:0 auto;padding:60px 32px 100px;}
+.section{margin-bottom:80px;}
+.section-head{display:flex;align-items:flex-start;gap:18px;margin-bottom:32px;padding-bottom:20px;border-bottom:1px solid var(--border);}
+.s-num{font-family:var(--display);font-size:52px;line-height:1;flex-shrink:0;margin-top:-6px;}
+.s-num.c1{color:var(--v-purple);}
+.s-num.c2{color:var(--v-blue);}
+.s-num.c3{color:var(--v-cyan);}
+.s-num.c4{color:var(--v-amber);}
+.s-num.c5{color:var(--v-green);}
+.s-num.c6{color:var(--v-indigo);}
+.s-head-text h2{font-family:var(--display);font-size:26px;letter-spacing:1px;color:var(--white);line-height:1.2;}
+.s-head-text p{color:var(--text-dim);font-size:13px;margin-top:5px;}
+
+.why{background:var(--card);border:1px solid var(--border);border-left:3px solid var(--v-purple);border-radius:0 8px 8px 0;padding:16px 20px;margin-bottom:24px;font-size:13.5px;}
+.why.blue  {border-left-color:var(--v-blue);}
+.why.cyan  {border-left-color:var(--v-cyan);}
+.why.amber {border-left-color:var(--v-amber);}
+.why.green {border-left-color:var(--v-green);}
+.why.indigo{border-left-color:var(--v-indigo);}
+.why.red   {border-left-color:var(--v-red);}
+.why-label{font-family:var(--mono);font-size:9px;letter-spacing:2px;color:var(--v-purple);text-transform:uppercase;margin-bottom:6px;}
+.why.blue   .why-label{color:var(--v-blue);}
+.why.cyan   .why-label{color:var(--v-cyan);}
+.why.amber  .why-label{color:var(--v-amber);}
+.why.green  .why-label{color:var(--v-green);}
+.why.indigo .why-label{color:var(--v-indigo);}
+.why.red    .why-label{color:var(--v-red);}
+.why p{color:var(--text);line-height:1.6;}
+
+.code-wrap{margin-bottom:20px;}
+.code-label{background:var(--raised);border:1px solid var(--border);border-bottom:none;border-radius:6px 6px 0 0;padding:8px 14px;display:flex;align-items:center;gap:10px;font-family:var(--mono);font-size:10px;letter-spacing:1px;color:var(--text-dim);}
+.cl-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.cl-p{background:var(--v-purple);}
+.cl-b{background:var(--v-blue);}
+.cl-c{background:var(--v-cyan);}
+.cl-a{background:var(--v-amber);}
+.cl-g{background:var(--v-green);}
+.cl-i{background:var(--v-indigo);}
+.cl-r{background:var(--v-red);}
+pre{background:var(--code-bg);border:1px solid var(--border);border-radius:0 0 6px 6px;padding:20px 18px;overflow-x:auto;font-family:var(--mono);font-size:12.5px;line-height:1.75;}
+code{font-family:var(--mono);font-size:12.5px;}
+
+.kw{color:#b39ddb;}
+.fn{color:#82aaff;}
+.st{color:#c3e88d;}
+.cm{color:#37474f;font-style:italic;}
+.nm{color:#f78c6c;}
+.cl{color:#80cbc4;}
+.dc{color:#b39ddb;}
+.op{color:#89ddff;}
+.vr{color:#eeffff;}
+.hl {background:rgba(124,77,255,.1);display:block;margin:0 -18px;padding:0 18px;}
+.hl-b{background:rgba(66,133,244,.09);display:block;margin:0 -18px;padding:0 18px;}
+.hl-c{background:rgba(0,188,212,.08);display:block;margin:0 -18px;padding:0 18px;}
+.hl-a{background:rgba(255,179,0,.07);display:block;margin:0 -18px;padding:0 18px;}
+.hl-g{background:rgba(0,137,123,.08);display:block;margin:0 -18px;padding:0 18px;}
+
+.steps{display:flex;flex-direction:column;gap:14px;margin-bottom:24px;}
+.step{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:16px 18px;display:flex;gap:16px;}
+.step-n{font-family:var(--display);font-size:26px;color:var(--border2);flex-shrink:0;line-height:1;margin-top:2px;min-width:30px;}
+.step-body strong{display:block;color:var(--white);font-size:14px;margin-bottom:4px;}
+.step-body p{color:var(--text-dim);font-size:13px;line-height:1.55;}
+.step-body code{background:rgba(255,255,255,.06);padding:1px 5px;border-radius:3px;color:var(--v-cyan);font-size:11.5px;}
+
+.alert{border-radius:6px;padding:14px 18px;margin-bottom:20px;display:flex;gap:12px;font-size:13px;align-items:flex-start;}
+.alert-info{background:rgba(124,77,255,.06);border:1px solid rgba(124,77,255,.2);}
+.alert-warn{background:rgba(255,179,0,.06);border:1px solid rgba(255,179,0,.2);}
+.alert-ok{background:rgba(0,137,123,.06);border:1px solid rgba(0,137,123,.2);}
+.alert-danger{background:rgba(229,57,53,.06);border:1px solid rgba(229,57,53,.2);}
+.alert-blue{background:rgba(66,133,244,.06);border:1px solid rgba(66,133,244,.2);}
+.alert-icon{font-size:16px;flex-shrink:0;margin-top:1px;}
+.alert-body strong{display:block;color:var(--white);margin-bottom:3px;font-size:13px;}
+.alert-body p{color:var(--text-dim);line-height:1.5;}
+.alert-body code{background:rgba(255,255,255,.08);padding:1px 5px;border-radius:3px;color:var(--v-cyan);font-size:11px;font-family:var(--mono);}
+
+/* DECISION TABLE */
+.decision-grid{display:grid;grid-template-columns:1fr 1fr;gap:0;margin-bottom:24px;border:1px solid var(--border);border-radius:8px;overflow:hidden;}
+.dg-head{padding:12px 20px;font-family:var(--mono);font-size:10px;letter-spacing:2px;text-transform:uppercase;border-bottom:1px solid var(--border);}
+.dg-h-vertex{color:var(--v-purple);background:rgba(124,77,255,.06);}
+.dg-h-direct{color:var(--v-cyan);background:rgba(0,188,212,.06);}
+.dg-body{padding:16px 20px;background:var(--card);}
+.dg-body ul{margin:0;padding:0;list-style:none;}
+.dg-body li{font-size:13px;color:var(--text);padding:5px 0;border-bottom:1px solid rgba(255,255,255,.04);}
+.dg-body li:last-child{border-bottom:none;}
+.dg-body li::before{content:'✓ ';color:var(--v-purple);}
+.dg-h-direct+.dg-body li::before{color:var(--v-cyan);}
+
+.flow{display:flex;align-items:center;flex-wrap:wrap;gap:0;margin:24px 0;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:20px 24px;}
+.flow-box{background:var(--raised);border:1px solid var(--border2);border-radius:6px;padding:10px 14px;text-align:center;min-width:100px;}
+.flow-box .fb-label{font-family:var(--mono);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-dim);margin-bottom:4px;}
+.flow-box .fb-name{font-weight:600;color:var(--white);font-size:12px;}
+.flow-arrow{font-family:var(--mono);color:var(--border2);font-size:20px;padding:0 8px;flex-shrink:0;}
+.fb-p{border-color:rgba(124,77,255,.35);}
+.fb-b{border-color:rgba(66,133,244,.35);}
+.fb-c{border-color:rgba(0,188,212,.35);}
+.fb-a{border-color:rgba(255,179,0,.35);}
+.fb-g{border-color:rgba(0,137,123,.35);}
+
+table{width:100%;border-collapse:collapse;margin-bottom:20px;font-size:13px;}
+th{font-family:var(--mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--text-dim);padding:10px 14px;border-bottom:1px solid var(--border);text-align:left;}
+td{padding:9px 14px;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:top;line-height:1.5;color:var(--text);}
+tr:last-child td{border-bottom:none;}
+td code{font-family:var(--mono);font-size:11px;background:rgba(255,255,255,.05);padding:1px 5px;border-radius:3px;color:var(--v-cyan);}
+.td-g{color:var(--v-green);}
+.td-a{color:var(--v-amber);}
+.td-r{color:var(--v-red);}
+.td-p{color:var(--v-purple);}
+
+hr{border:none;height:1px;background:linear-gradient(to right,transparent,var(--border),transparent);margin:60px 0;}
+footer{text-align:center;color:var(--text-dim);font-family:var(--mono);font-size:11px;padding:32px;border-top:1px solid var(--border);letter-spacing:.5px;}
+footer strong{color:var(--v-purple);}
+p code,li code{font-family:var(--mono);font-size:11.5px;background:rgba(255,255,255,.06);padding:1px 5px;border-radius:3px;color:var(--v-cyan);}
+ul{margin:10px 0 16px 20px;}
+li{margin-bottom:6px;color:var(--text);font-size:13.5px;line-height:1.55;}
+h3{color:var(--white);font-size:15px;margin-bottom:14px;font-family:var(--mono);letter-spacing:1px;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="h-eyebrow">// Google Cloud Platform · Vertex AI · Enterprise AI</div>
+  <h1>VERTEX AI<br><em>COMPLETE GUIDE</em></h1>
+  <p class="h-sub">Gemini on Vertex AI, Agent Builder, Vertex AI Search (RAG), Model Garden, and when to choose Vertex AI over direct Gemini API — with working code and hands-on tasks 18–22 covered in full.</p>
+  <div class="h-tags">
+    <span class="tag tag-p">Gemini on Vertex</span>
+    <span class="tag tag-b">Agent Builder</span>
+    <span class="tag tag-c">Vertex AI Search</span>
+    <span class="tag tag-g">RAG Grounding</span>
+    <span class="tag tag-a">Model Garden</span>
+    <span class="tag tag-i">Service Account Auth</span>
+  </div>
+</header>
+
+<nav>
+  <a href="#mental-model">Mental Model</a>
+  <a href="#decision">When to Use Which</a>
+  <a href="#setup">Setup</a>
+  <a href="#gemini-vertex">Gemini on Vertex</a>
+  <a href="#agent-builder">Agent Builder</a>
+  <a href="#search">Vertex Search</a>
+  <a href="#model-garden">Model Garden</a>
+  <a href="#tasks">Tasks 18–22</a>
+</nav>
+
+<main>
+
+<!-- ══════ MENTAL MODEL ══════ -->
+<div class="section" id="mental-model" style="margin-top:0;padding-top:0;">
+  <div class="section-head">
+    <div class="s-num c1">◈</div>
+    <div class="s-head-text">
+      <h2>THE VERTEX AI MENTAL MODEL</h2>
+      <p>What Vertex AI is, how it relates to Gemini API, and how it fits your project</p>
+    </div>
+  </div>
+
+  <div class="why">
+    <div class="why-label">↳ The Core Relationship</div>
+    <p>Think of it this way: <strong style="color:var(--white);">Gemini API Direct</strong> is like using a public API with an API key — fast, simple, great for prototyping. <strong style="color:var(--white);">Vertex AI</strong> is like checking into the same hotel but through the corporate account — same rooms (same Gemini models), but with enterprise billing, access controls, audit logging, and integration with every other GCP service. The models are identical. The authentication and surrounding ecosystem are different.</p>
+  </div>
+
+  <div class="flow" style="flex-wrap:wrap;row-gap:14px;">
+    <div class="flow-box fb-p"><div class="fb-label">Your FastAPI App</div><div class="fb-name">Cloud Run</div></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box fb-b"><div class="fb-label">Auth</div><div class="fb-name">Service Account</div></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box fb-p"><div class="fb-label">Vertex AI</div><div class="fb-name">API Endpoint</div></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box fb-g"><div class="fb-label">Gemini Model</div><div class="fb-name">1.5 Flash/Pro</div></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box fb-c"><div class="fb-label">Response</div><div class="fb-name">Same Output</div></div>
+  </div>
+
+  <table>
+    <thead><tr><th>Layer</th><th>Gemini API Direct</th><th>Vertex AI</th></tr></thead>
+    <tbody>
+      <tr><td>Authentication</td><td>API key in header</td><td class="td-p">Service account / ADC (Application Default Credentials)</td></tr>
+      <tr><td>Billing</td><td>Separate Google AI billing</td><td class="td-g">Unified with your GCP project</td></tr>
+      <tr><td>Models Available</td><td>Gemini family</td><td>Gemini + Llama + Claude + Mistral + 50+ others</td></tr>
+      <tr><td>Agent Builder</td><td class="td-r">Not available</td><td class="td-g">Full no-code agent platform</td></tr>
+      <tr><td>Vector Search / RAG</td><td class="td-r">Not available</td><td class="td-g">Built-in Vertex AI Search</td></tr>
+      <tr><td>Audit Logging</td><td class="td-r">No</td><td class="td-g">Full Cloud Audit Logs</td></tr>
+      <tr><td>Data residency control</td><td class="td-r">Limited</td><td class="td-g">Choose region, data stays there</td></tr>
+      <tr><td>Setup complexity</td><td class="td-g">5 minutes</td><td>15–30 minutes first time</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<hr>
+
+<!-- ══════ DECISION GUIDE ══════ -->
+<div class="section" id="decision">
+  <div class="section-head">
+    <div class="s-num c2">01</div>
+    <div class="s-head-text">
+      <h2>WHEN TO USE WHICH — THE DECISION GUIDE</h2>
+      <p>Task 22 — A definitive framework for choosing your platform</p>
+    </div>
+  </div>
+
+  <div class="decision-grid">
+    <div>
+      <div class="dg-head dg-h-vertex">Use Vertex AI When...</div>
+      <div class="dg-body">
+        <ul>
+          <li>App is deployed on Cloud Run / GCP</li>
+          <li>Need IAM / service account authentication</li>
+          <li>Using Agent Builder for no-code agents</li>
+          <li>Need Vertex AI Search for document RAG</li>
+          <li>Production apps post-hackathon</li>
+          <li>Need unified GCP billing</li>
+          <li>Need access to non-Gemini models (Llama, Claude via Model Garden)</li>
+          <li>Compliance requires audit logs</li>
+        </ul>
+      </div>
+    </div>
+    <div>
+      <div class="dg-head dg-h-direct">Use Gemini API Direct When...</div>
+      <div class="dg-body">
+        <ul>
+          <li>Local development and prototyping</li>
+          <li>Simpler auth — just an API key</li>
+          <li>Quick iteration, testing prompts</li>
+          <li>Hackathon demo build (Day 1–8 hours)</li>
+          <li>Building on a non-GCP platform</li>
+          <li>No billing account set up yet</li>
+          <li>Testing ideas in AI Studio playground</li>
+          <li>Free tier is sufficient for load</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="why cyan">
+    <div class="why-label">↳ Recommended Strategy for Your Hackathon</div>
+    <p><strong style="color:var(--white);">Development phase:</strong> Use Gemini API Direct with your AI Studio key. Build fast, iterate fast, test all your agents and prompts.<br><br>
+    <strong style="color:var(--white);">Demo deployment:</strong> Switch to Vertex AI in your Cloud Run service. Use your service account credentials. Your code changes by exactly <strong>4 lines</strong> — the import and the model initialisation. Everything else (prompts, function calling, streaming) works identically.</p>
+  </div>
+</div>
+
+<hr>
+
+<!-- ══════ SETUP ══════ -->
+<div class="section" id="setup">
+  <div class="section-head">
+    <div class="s-num c3">02</div>
+    <div class="s-head-text">
+      <h2>SETUP — ENABLE API AND AUTHENTICATE</h2>
+      <p>Tasks 18, 19 & 20 — Enable, install, and authenticate with a service account</p>
+    </div>
+  </div>
+
+  <h3>TASK 18 — ENABLE THE VERTEX AI API</h3>
+  <div class="code-wrap">
+    <div class="code-label"><span class="cl-dot cl-p"></span>POWERSHELL — enable aiplatform API</div>
+    <pre><span class="cm"># Enable the API (aiplatform is the internal name for Vertex AI)</span>
+gcloud services enable aiplatform.googleapis.com
+
+<span class="cm"># Also enable these — needed for Agent Builder and Vertex AI Search</span>
+gcloud services enable discoveryengine.googleapis.com
+gcloud services enable dialogflow.googleapis.com
+
+<span class="cm"># Confirm all enabled</span>
+gcloud services list --enabled --filter=<span class="st">"name:(aiplatform OR discoveryengine)"</span></pre>
+  </div>
+
+  <h3>TASK 19 — INSTALL SDK AND CALL GEMINI VIA VERTEX AI</h3>
+  <div class="code-wrap">
+    <div class="code-label"><span class="cl-dot cl-p"></span>POWERSHELL — install the Vertex AI SDK</div>
+    <pre">.\venv\Scripts\activate
+
+<span class="cm"># Vertex AI SDK — different from google-generativeai</span>
+pip install google-cloud-aiplatform
+
+pip freeze > requirements.txt</pre>
+  </div>
+
+  <h3>TASK 20 — SERVICE ACCOUNT AUTHENTICATION</h3>
+
+  <div class="why blue">
+    <div class="why-label">↳ Three Authentication Methods for Vertex AI</div>
+    <p><strong style="color:var(--white);">Method 1 — Application Default Credentials (ADC):</strong> Run <code>gcloud auth application-default login</code> on your local machine. The SDK finds credentials automatically. Best for local development.<br><br>
+    <strong style="color:var(--white);">Method 2 — Service Account JSON Key:</strong> Download a JSON key file, set <code>GOOGLE_APPLICATION_CREDENTIALS</code> env var to its path. Required for Task 20. Works everywhere.<br><br>
+    <strong style="color:var(--white);">Method 3 — Workload Identity (Cloud Run):</strong> No key file. Cloud Run's attached service account provides credentials automatically. This is what your deployed app uses from Guide 1.</p>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-label"><span class="cl-dot cl-b"></span>POWERSHELL — create service account and download key (Task 20)</div>
+    <pre><span class="cm"># Use the service account created in the Cloud Run guide,</span>
+<span class="cm"># or create a new one specifically for Vertex AI</span>
+$PROJECT_ID = <span class="st">"your-project-id"</span>
+$SA_EMAIL   = <span class="st">"project-test-sa@$PROJECT_ID.iam.gserviceaccount.com"</span>
+
+<span class="cm"># Grant Vertex AI User role</span>
+gcloud projects add-iam-policy-binding $PROJECT_ID `
+  --member=<span class="st">"serviceAccount:$SA_EMAIL"</span> `
+  --role=<span class="st">"roles/aiplatform.user"</span>
+
+<span class="cm"># Download the JSON key (use ONLY for local dev / Task 20)</span>
+gcloud iam service-accounts keys create vertex-sa-key.json `
+  --iam-account $SA_EMAIL
+
+<span class="cm"># Add to .env (point to the key file)</span>
+<span class="cm"># GOOGLE_APPLICATION_CREDENTIALS=C:\Users\7480\Desktop\python-codes\Project_test\vertex-sa-key.json</span>
+
+<span class="cm"># ⚠️ Add vertex-sa-key.json to .gitignore immediately</span></pre>
+  </div>
+
+  <div class="alert alert-warn">
+    <span class="alert-icon">⚠️</span>
+    <div class="alert-body">
+      <strong>Never commit the JSON key file to Git</strong>
+      <p>Add <code>vertex-sa-key.json</code> and <code>*.json</code> to your <code>.gitignore</code> right now. If you push it to a public repo, attackers will find it within seconds via GitHub token scanners. For your Cloud Run deployment, you don't need the key file at all — Workload Identity handles it from Guide 1.</p>
+    </div>
+  </div>
+</div>
+
+<hr>
+
+<!-- ══════ GEMINI ON VERTEX ══════ -->
+<div class="section" id="gemini-vertex">
+  <div class="section-head">
+    <div class="s-num c1">03</div>
+    <div class="s-head-text">
+      <h2>GEMINI ON VERTEX AI — THE CODE</h2>
+      <p>Tasks 19 & 22 — Same model, different SDK, 4-line switch from direct API</p>
+    </div>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-label"><span class="cl-dot cl-p"></span>vertex_gemini.py — Task 19 — calling Gemini 1.5 Flash through Vertex AI</div>
+    <pre"><span class="kw">import</span> os
+<span class="kw">from</span> dotenv <span class="kw">import</span> load_dotenv
+
+load_dotenv()
+
+<span class="cm"># ════════════════════════════════════════════════
+# THE 4-LINE DIFFERENCE FROM DIRECT GEMINI API
+# ════════════════════════════════════════════════</span>
+
+<span class="cm"># Direct Gemini API (what you've been using):</span>
+<span class="cm"># import google.generativeai as genai</span>
+<span class="cm"># genai.configure(api_key=os.getenv("GEMINI_API_KEY"))</span>
+<span class="cm"># model = genai.GenerativeModel("gemini-1.5-flash")</span>
+
+<span class="cm"># Vertex AI (this file):</span>
+<span class="hl">import vertexai
+<span class="kw">from</span> vertexai.generative_models <span class="kw">import</span> GenerativeModel, GenerationConfig
+
+vertexai.<span class="fn">init</span>(
+    project=os.<span class="fn">getenv</span>(<span class="st">"GOOGLE_CLOUD_PROJECT"</span>),
+    location=<span class="st">"us-central1"</span>
+)
+model = <span class="cl">GenerativeModel</span>(<span class="st">"gemini-1.5-flash-001"</span>)</span>
+
+<span class="cm"># ── From here, the API is nearly identical ──</span>
+
+<span class="cm"># Basic generation</span>
+response = model.<span class="fn">generate_content</span>(
+    <span class="st">"What are the customs procedures for importing electronics to Pakistan?"</span>
+)
+print(response.text)
+
+<span class="cm"># Generation config</span>
+config = <span class="cl">GenerationConfig</span>(
+    temperature=<span class="nm">0.3</span>,
+    max_output_tokens=<span class="nm">500</span>
+)
+response = model.<span class="fn">generate_content</span>(
+    <span class="st">"Summarise current PKR/USD exchange risk in 3 bullet points."</span>,
+    generation_config=config
+)
+print(response.text)
+
+<span class="cm"># Streaming — identical to direct API</span>
+<span class="kw">for</span> chunk <span class="kw">in</span> model.<span class="fn">generate_content</span>(<span class="st">"Explain Suez Canal risk for Pakistani shippers."</span>, stream=<span class="kw">True</span>):
+    print(chunk.text, end=<span class="st">""</span>, flush=<span class="kw">True</span>)</pre>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-label"><span class="cl-dot cl-p"></span>Task 22 — side-by-side comparison: Direct API vs Vertex AI</div>
+    <pre"><span class="kw">import</span> os
+<span class="kw">import</span> google.generativeai <span class="kw">as</span> genai
+<span class="kw">import</span> vertexai
+<span class="kw">from</span> vertexai.generative_models <span class="kw">import</span> GenerativeModel <span class="kw">as</span> VertexModel
+<span class="kw">from</span> dotenv <span class="kw">import</span> load_dotenv
+
+load_dotenv()
+
+PROMPT = <span class="st">"What is the risk score (1-10) for shipping via Suez Canal today?"</span>
+
+<span class="cm"># ── Method A: Direct Gemini API ──</span>
+genai.<span class="fn">configure</span>(api_key=os.<span class="fn">getenv</span>(<span class="st">"GEMINI_API_KEY"</span>))
+direct_model  = genai.<span class="cl">GenerativeModel</span>(<span class="st">"gemini-1.5-flash"</span>)
+direct_resp   = direct_model.<span class="fn">generate_content</span>(PROMPT)
+
+<span class="cm"># ── Method B: Vertex AI ──</span>
+vertexai.<span class="fn">init</span>(project=os.<span class="fn">getenv</span>(<span class="st">"GOOGLE_CLOUD_PROJECT"</span>), location=<span class="st">"us-central1"</span>)
+vertex_model  = <span class="cl">VertexModel</span>(<span class="st">"gemini-1.5-flash-001"</span>)
+vertex_resp   = vertex_model.<span class="fn">generate_content</span>(PROMPT)
+
+<span class="cm"># ── Compare ──</span>
+print(<span class="st">"=== DIRECT GEMINI API ==="</span>)
+print(direct_resp.text)
+
+print(<span class="st">"\n=== VERTEX AI ==="</span>)
+print(vertex_resp.text)
+
+print(<span class="st">"\n--- Conclusion ---"</span>)
+print(<span class="st">"Same model. Same prompt. Outputs should be semantically equivalent."</span>)
+print(<span class="st">"The only difference: auth method and surrounding ecosystem."</span>)</pre>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-label"><span class="cl-dot cl-p"></span>vertex_client.py — production-ready Vertex AI client module</div>
+    <pre"><span class="cm">"""
+vertex_client.py
+Drop-in replacement for gemini_client.py when deploying to Cloud Run.
+On Cloud Run: vertexai.init() picks up credentials automatically
+from the attached service account (no key file needed).
+Locally: set GOOGLE_APPLICATION_CREDENTIALS in .env.
+"""</span>
+<span class="kw">import</span> os
+<span class="kw">import</span> vertexai
+<span class="kw">from</span> vertexai.generative_models <span class="kw">import</span> GenerativeModel, GenerationConfig
+<span class="kw">from</span> dotenv <span class="kw">import</span> load_dotenv
+
+load_dotenv()
+
+<span class="hl">vertexai.<span class="fn">init</span>(
+    project=os.<span class="fn">getenv</span>(<span class="st">"GOOGLE_CLOUD_PROJECT"</span>),
+    location=<span class="st">"us-central1"</span>
+)</span>
+
+FLASH = <span class="st">"gemini-1.5-flash-001"</span>
+PRO   = <span class="st">"gemini-1.5-pro-001"</span>
+
+<span class="kw">def</span> <span class="fn">get_model</span>(model_name: str = FLASH, system_instruction: str = <span class="kw">None</span>) -> <span class="cl">GenerativeModel</span>:
+    <span class="kw">return</span> <span class="cl">GenerativeModel</span>(
+        model_name,
+        system_instruction=system_instruction
+    )
+
+<span class="cm"># Usage: from vertex_client import get_model, FLASH</span>
+<span class="cm"># model = get_model(FLASH, system_instruction="You are CargoSense...")</span></pre>
+  </div>
+</div>
+
+<hr>
+
+<!-- ══════ AGENT BUILDER ══════ -->
+<div class="section" id="agent-builder">
+  <div class="section-head">
+    <div class="s-num c4">04</div>
+    <div class="s-head-text">
+      <h2>VERTEX AI AGENT BUILDER — NO-CODE AGENTS</h2>
+      <p>Task 21 — Create an agent, upload a PDF, test grounded queries in the console</p>
+    </div>
+  </div>
+
+  <div class="why amber">
+    <div class="why-label">↳ Why Agent Builder Exists and When to Use It</div>
+    <p>Agent Builder is Google's answer to: "I want a production-grade conversational agent with document search, but I don't want to write the RAG pipeline from scratch." It gives you a managed system that handles chunking, embedding, vector storage, retrieval, and response generation — all configured through a UI. For your hackathon, use it to <strong>rapidly prototype</strong> the Government Service Navigator or LC Compliance Agent. Upload the official FBR guide or UCP 600 PDF, and you have a searchable knowledge base in under 10 minutes. Then you can call this agent from your FastAPI backend via API.</p>
+  </div>
+
+  <h3>TASK 21 — CREATE AN AGENT BUILDER AGENT (CONSOLE WALKTHROUGH)</h3>
+  <div class="steps">
+    <div class="step"><span class="step-n" style="color:var(--v-amber);">1</span><div class="step-body"><strong>Open Agent Builder</strong><p>Go to GCP Console → Navigation menu → "Vertex AI" → "Agent Builder". Or search "Agent Builder" in the top search bar. First time: it may ask you to enable the Discovery Engine API — approve it.</p></div></div>
+    <div class="step"><span class="step-n" style="color:var(--v-amber);">2</span><div class="step-body"><strong>Create an App</strong><p>Click "Create App" → Choose <strong>"Search"</strong> (for document search / RAG) or <strong>"Conversational Agent"</strong> (for a full chatbot). For Task 21, choose "Search". Name it <code>cargo-sense-search</code>.</p></div></div>
+    <div class="step"><span class="step-n" style="color:var(--v-amber);">3</span><div class="step-body"><strong>Create a Data Store</strong><p>Click "Create Data Store" → "Cloud Storage" → upload your PDF (e.g. the FBR Import Procedures guide, or a sample Letter of Credit). Alternatively paste a website URL for web crawling. Agent Builder chunks and embeds the document automatically.</p></div></div>
+    <div class="step"><span class="step-n" style="color:var(--v-amber);">4</span><div class="step-body"><strong>Wait for Indexing</strong><p>Indexing takes 5–15 minutes for a PDF. You'll see the status change from "Pending" to "Active" in the Data Store panel. For a hackathon, upload your PDF the night before.</p></div></div>
+    <div class="step"><span class="step-n" style="color:var(--v-amber);">5</span><div class="step-body"><strong>Test a Grounded Query</strong><p>Go to the "Preview" tab. Type: "What documents are required to import electronics under an LC?" The response will include quotes from your uploaded PDF with citations. This is RAG working.</p></div></div>
+    <div class="step"><span class="step-n" style="color:var(--v-amber);">6</span><div class="step-body"><strong>Get the API Integration Details</strong><p>Go to "Integration" tab. Find your <code>engine_id</code> and <code>project_id</code>. You'll use these to call Agent Builder from Python code (see code block below).</p></div></div>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-label"><span class="cl-dot cl-a"></span>agent_builder_search.py — query your Agent Builder data store from Python</div>
+    <pre"><span class="kw">import</span> os
+<span class="kw">from</span> google.cloud <span class="kw">import</span> discoveryengine_v1 <span class="kw">as</span> discoveryengine
+<span class="kw">from</span> dotenv <span class="kw">import</span> load_dotenv
+
+load_dotenv()
+
+<span class="cm"># pip install google-cloud-discoveryengine</span>
+
+<span class="kw">def</span> <span class="fn">search_cargo_docs</span>(query: str) -> list[dict]:
+    <span class="cm">"""
+    Query your Agent Builder data store.
+    Returns a list of matching document snippets with citations.
+    Use this as a tool in your Gemini function calling setup.
+    """</span>
+    project_id  = os.<span class="fn">getenv</span>(<span class="st">"GOOGLE_CLOUD_PROJECT"</span>)
+    location    = <span class="st">"global"</span>
+    <span class="hl-a">    data_store_id = <span class="st">"cargo-sense-search_XXXX"</span>  <span class="cm"># from Agent Builder console</span></span>
+
+    client = discoveryengine.<span class="cl">SearchServiceClient</span>()
+
+    serving_config = (
+        <span class="st">f"projects/{project_id}/locations/{location}/"</span>
+        <span class="st">f"collections/default_collection/"</span>
+        <span class="st">f"dataStores/{data_store_id}/"</span>
+        <span class="st">f"servingConfigs/default_config"</span>
+    )
+
+    request = discoveryengine.<span class="cl">SearchRequest</span>(
+        serving_config=serving_config,
+        query=query,
+        page_size=<span class="nm">5</span>,               <span class="cm"># top 5 most relevant chunks</span>
+        query_expansion_spec=discoveryengine.<span class="cl">SearchRequest</span>.<span class="cl">QueryExpansionSpec</span>(
+            condition=discoveryengine.<span class="cl">SearchRequest</span>.<span class="cl">QueryExpansionSpec</span>.<span class="cl">Condition</span>.AUTO
+        )
+    )
+
+    response = client.<span class="fn">search</span>(request)
+    results = []
+
+    <span class="kw">for</span> r <span class="kw">in</span> response.results:
+        doc = r.document.derived_struct_data
+        results.<span class="fn">append</span>({
+            <span class="st">"title"</span>:   doc.<span class="fn">get</span>(<span class="st">"title"</span>, <span class="st">"Unknown"</span>),
+            <span class="st">"snippet"</span>: doc.<span class="fn">get</span>(<span class="st">"snippets"</span>, [{}])[<span class="nm">0</span>].<span class="fn">get</span>(<span class="st">"snippet"</span>, <span class="st">""</span>),
+            <span class="st">"link"</span>:    doc.<span class="fn">get</span>(<span class="st">"link"</span>, <span class="st">""</span>)
+        })
+
+    <span class="kw">return</span> results
+
+
+<span class="cm"># ── Use it as a Gemini tool ──</span>
+search_docs_tool = {
+    <span class="st">"name"</span>: <span class="st">"search_cargo_docs"</span>,
+    <span class="st">"description"</span>: (
+        <span class="st">"Search official import/export documents, FBR guides, "</span>
+        <span class="st">"and LC compliance rules. Use when the user asks about "</span>
+        <span class="st">"official procedures, customs rules, or LC requirements."</span>
+    ),
+    <span class="st">"parameters"</span>: {
+        <span class="st">"type"</span>: <span class="st">"object"</span>,
+        <span class="st">"properties"</span>: {
+            <span class="st">"query"</span>: {<span class="st">"type"</span>: <span class="st">"string"</span>, <span class="st">"description"</span>: <span class="st">"The search query"</span>}
+        },
+        <span class="st">"required"</span>: [<span class="st">"query"</span>]
+    }
+}</pre>
+  </div>
+</div>
+
+<hr>
+
+<!-- ══════ VERTEX AI SEARCH / RAG ══════ -->
+<div class="section" id="search">
+  <div class="section-head">
+    <div class="s-num c3">05</div>
+    <div class="s-head-text">
+      <h2>VERTEX AI SEARCH — RAG GROUNDING</h2>
+      <p>Give your agents access to document knowledge — government guides, UCP 600, FBR rules</p>
+    </div>
+  </div>
+
+  <div class="why cyan">
+    <div class="why-label">↳ What RAG Actually Means and Why It Matters for Your Agents</div>
+    <p><strong style="color:var(--white);">RAG = Retrieval Augmented Generation.</strong> Instead of relying on Gemini's training data (which has a knowledge cutoff and no access to your private documents), you: (1) store your documents in a vector database, (2) when a user asks a question, search for the most relevant document chunks, (3) inject those chunks into the Gemini prompt as context, (4) Gemini answers based on the real document content. For your <strong>Government Service Navigator</strong>, this means uploading SBP, FBR, and SECP official guides — your agent answers from actual government documentation, not from Gemini's general training data. That's the difference between a generic chatbot and a trustworthy compliance tool.</p>
+  </div>
+
+  <div class="flow">
+    <div class="flow-box fb-c"><div class="fb-label">User Query</div><div class="fb-name">"LC rules?"</div></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box fb-p"><div class="fb-label">Embed Query</div><div class="fb-name">Vector</div></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box fb-a"><div class="fb-label">Search Index</div><div class="fb-name">Top 5 chunks</div></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box fb-p"><div class="fb-label">Gemini +<br>Context</div><div class="fb-name">Grounded call</div></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box fb-g"><div class="fb-label">Answer +<br>Citation</div><div class="fb-name">Sourced</div></div>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-label"><span class="cl-dot cl-c"></span>vertex_rag.py — Vertex AI Search + Gemini grounding in Python</div>
+    <pre"><span class="kw">import</span> os
+<span class="kw">import</span> vertexai
+<span class="kw">from</span> vertexai.generative_models <span class="kw">import</span> (
+    GenerativeModel, Tool, grounding
+)
+<span class="kw">from</span> dotenv <span class="kw">import</span> load_dotenv
+
+load_dotenv()
+vertexai.<span class="fn">init</span>(
+    project=os.<span class="fn">getenv</span>(<span class="st">"GOOGLE_CLOUD_PROJECT"</span>),
+    location=<span class="st">"us-central1"</span>
+)
+
+<span class="cm"># ── Option A: Ground with Vertex AI Search data store ──</span>
+<span class="cm"># Use when you've uploaded documents to Agent Builder</span>
+<span class="hl-c">data_store_path = (
+    <span class="st">f"projects/{os.getenv('GOOGLE_CLOUD_PROJECT')}/"</span>
+    <span class="st">f"locations/global/collections/default_collection/"</span>
+    <span class="st">f"dataStores/cargo-sense-search_XXXX"</span>  <span class="cm"># your data store ID</span>
+)
+
+search_tool = <span class="cl">Tool</span>.from_retrieval(
+    retrieval=grounding.<span class="cl">Retrieval</span>(
+        source=grounding.<span class="cl">VertexAISearch</span>(datastore=data_store_path)
+    )
+)
+
+model_with_search = <span class="cl">GenerativeModel</span>(
+    <span class="st">"gemini-1.5-flash-001"</span>,
+    system_instruction=<span class="st">"You are an LC compliance expert. Always cite your sources."</span>,
+    tools=[search_tool]
+)</span>
+
+response = model_with_search.<span class="fn">generate_content</span>(
+    <span class="st">"What documents are required for an LC covering textile imports from China to Pakistan under UCP 600?"</span>
+)
+print(response.text)
+
+<span class="cm"># The response includes grounding citations — links to the actual documents</span>
+<span class="kw">if</span> response.candidates[<span class="nm">0</span>].grounding_metadata:
+    print(<span class="st">"\n--- Sources ---"</span>)
+    <span class="kw">for</span> chunk <span class="kw">in</span> response.candidates[<span class="nm">0</span>].grounding_metadata.grounding_chunks:
+        print(<span class="st">f"- {chunk.retrieved_context.title}: {chunk.retrieved_context.uri}"</span>)
+
+
+<span class="cm"># ── Option B: Ground with Google Search (live web results) ──</span>
+<span class="cm"># No data store needed — uses live Google Search as context</span>
+<span class="hl-b">web_search_tool = <span class="cl">Tool</span>.from_google_search_retrieval(
+    google_search_retrieval=grounding.<span class="cl">GoogleSearchRetrieval</span>()
+)
+
+model_with_web = <span class="cl">GenerativeModel</span>(
+    <span class="st">"gemini-1.5-flash-001"</span>,
+    tools=[web_search_tool]
+)
+
+response = model_with_web.<span class="fn">generate_content</span>(
+    <span class="st">"What is the current PKR to USD exchange rate and what are analysts saying about it?"</span>
+)
+print(response.text)</span></pre>
+  </div>
+
+  <table>
+    <thead><tr><th>Your Agent</th><th>Document to Upload</th><th>Query it Answers</th></tr></thead>
+    <tbody>
+      <tr><td>Government Service Navigator</td><td>FBR Import Procedures PDF, SBP Forex Rules</td><td class="td-g">"What permits do I need to import solar panels?"</td></tr>
+      <tr><td>LC Compliance Agent</td><td>UCP 600 Full Text, sample LCs</td><td class="td-g">"Is a 21-day document presentation period standard?"</td></tr>
+      <tr><td>CargoSense</td><td>PIFFA shipping guidelines, customs tariff schedule</td><td class="td-g">"What is the duty rate on HS code 8471?"</td></tr>
+      <tr><td>FX Advisor</td><td class="td-a">Use Google Search grounding instead</td><td>"Current PKR rate with analyst commentary"</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<hr>
+
+<!-- ══════ MODEL GARDEN ══════ -->
+<div class="section" id="model-garden">
+  <div class="section-head">
+    <div class="s-num c5">06</div>
+    <div class="s-head-text">
+      <h2>MODEL GARDEN — BEYOND GEMINI</h2>
+      <p>Access Llama, Mistral, Claude, and 50+ other models through one platform</p>
+    </div>
+  </div>
+
+  <div class="why green">
+    <div class="why-label">↳ Why Model Garden Matters Post-Hackathon</div>
+    <p>Model Garden is a unified model marketplace inside Vertex AI. Same service account, same billing, access to models from Google, Meta, Mistral, Anthropic, and others. For your hackathon, you won't need it — Gemini 1.5 Flash handles everything. But for production, it matters: if a specific task (e.g. legal document analysis) performs significantly better with Claude, you can switch without changing your authentication setup, billing account, or deployment infrastructure.</p>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-label"><span class="cl-dot cl-g"></span>model_garden.py — accessing different models through Vertex AI</div>
+    <pre"><span class="kw">import</span> os
+<span class="kw">import</span> vertexai
+<span class="kw">from</span> vertexai.generative_models <span class="kw">import</span> GenerativeModel
+<span class="kw">from</span> vertexai.preview.language_models <span class="kw">import</span> TextGenerationModel
+<span class="kw">from</span> dotenv <span class="kw">import</span> load_dotenv
+
+load_dotenv()
+vertexai.<span class="fn">init</span>(project=os.<span class="fn">getenv</span>(<span class="st">"GOOGLE_CLOUD_PROJECT"</span>), location=<span class="st">"us-central1"</span>)
+
+<span class="cm"># ── Gemini models (fully supported, use these for hackathon) ──</span>
+<span class="hl-g">flash   = <span class="cl">GenerativeModel</span>(<span class="st">"gemini-1.5-flash-001"</span>)  <span class="cm"># fast + cheap</span>
+pro     = <span class="cl">GenerativeModel</span>(<span class="st">"gemini-1.5-pro-001"</span>)    <span class="cm"># smarter, slower</span>
+flash2  = <span class="cl">GenerativeModel</span>(<span class="st">"gemini-2.0-flash-001"</span>)  <span class="cm"># latest</span></span>
+
+<span class="cm"># ── Llama 3.1 via Model Garden (requires model enablement in console) ──</span>
+<span class="cm"># Go to Model Garden → search "Llama" → Enable → then use this:</span>
+<span class="cm"># llama = GenerativeModel("meta/llama3-405b-instruct-maas")</span>
+
+<span class="cm"># ── Claude via Model Garden (if Anthropic agreement signed) ──</span>
+<span class="cm"># claude = GenerativeModel("claude-3-5-sonnet@20241022")</span>
+
+<span class="cm"># ── Choosing the right model for your hackathon tasks ──</span>
+TASK_MODEL_MAP = {
+    <span class="st">"risk_analysis"</span>:        <span class="st">"gemini-1.5-flash-001"</span>,   <span class="cm"># fast enough, structured output</span>
+    <span class="st">"document_compliance"</span>:  <span class="st">"gemini-1.5-pro-001"</span>,     <span class="cm"># complex reasoning needed</span>
+    <span class="st">"fx_advisory"</span>:          <span class="st">"gemini-1.5-flash-001"</span>,   <span class="cm"># simple, fast</span>
+    <span class="st">"image_analysis"</span>:       <span class="st">"gemini-1.5-flash-001"</span>,   <span class="cm"># multimodal flash is sufficient</span>
+    <span class="st">"complex_legal"</span>:        <span class="st">"gemini-1.5-pro-001"</span>,     <span class="cm"># long context, nuanced</span>
+}</pre>
+  </div>
+
+  <table>
+    <thead><tr><th>Model</th><th>Best For</th><th>Hackathon Use</th><th>Speed</th></tr></thead>
+    <tbody>
+      <tr><td><code>gemini-1.5-flash-001</code></td><td>Most tasks, fast responses</td><td class="td-g">✓ Primary model for all agents</td><td class="td-g">Fast</td></tr>
+      <tr><td><code>gemini-1.5-pro-001</code></td><td>Complex reasoning, long docs</td><td>LC Compliance, legal analysis</td><td>Slower</td></tr>
+      <tr><td><code>gemini-2.0-flash-001</code></td><td>Latest capabilities</td><td>Experimental, may change</td><td>Fast</td></tr>
+      <tr><td>Llama 3.1 (via Garden)</td><td>Open source flexibility</td><td class="td-a">Not needed for hackathon</td><td>Variable</td></tr>
+      <tr><td>Claude 3.5 (via Garden)</td><td>Document analysis, writing</td><td class="td-a">Post-hackathon if needed</td><td>Medium</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<hr>
+
+<!-- ══════ HANDS-ON TASKS ══════ -->
+<div class="section" id="tasks">
+  <div class="section-head">
+    <div class="s-num c6">07</div>
+    <div class="s-head-text">
+      <h2>HANDS-ON TASKS 18–22 — COMPLETION CHECKLIST</h2>
+      <p>Each task with exact steps and verification criteria</p>
+    </div>
+  </div>
+
+  <div class="steps">
+    <div class="step">
+      <span class="step-n" style="color:var(--v-purple);">18</span>
+      <div class="step-body">
+        <strong>Enable Vertex AI API</strong>
+        <p>Run: <code>gcloud services enable aiplatform.googleapis.com</code>. Then verify: <code>gcloud services list --enabled --filter="name:aiplatform"</code>. You should see <code>aiplatform.googleapis.com</code> in the output.</p>
+      </div>
+    </div>
+    <div class="step">
+      <span class="step-n" style="color:var(--v-purple);">19</span>
+      <div class="step-body">
+        <strong>Install SDK and Call Gemini 1.5 Flash via Vertex AI</strong>
+        <p>Run <code>pip install google-cloud-aiplatform</code>. Then run <code>vertex_gemini.py</code> from this guide. Confirm you get a text response. The import is <code>from vertexai.generative_models import GenerativeModel</code> — not <code>google.generativeai</code>.</p>
+      </div>
+    </div>
+    <div class="step">
+      <span class="step-n" style="color:var(--v-purple);">20</span>
+      <div class="step-body">
+        <strong>Service Account with Vertex AI User Role</strong>
+        <p>Run the PowerShell commands to add <code>roles/aiplatform.user</code> to your service account. Download the JSON key. Set <code>GOOGLE_APPLICATION_CREDENTIALS</code> in your <code>.env</code> file. Re-run <code>vertex_gemini.py</code> — it should authenticate via the key file. Add <code>vertex-sa-key.json</code> to <code>.gitignore</code>.</p>
+      </div>
+    </div>
+    <div class="step">
+      <span class="step-n" style="color:var(--v-purple);">21</span>
+      <div class="step-body">
+        <strong>Create Agent Builder Agent, Upload PDF, Test Grounded Query</strong>
+        <p>In GCP Console → Agent Builder → Create App → Search. Upload any PDF (even a single-page document works). Wait for indexing. In Preview tab, type a question whose answer is in the PDF. Verify the response includes a citation snippet from your document.</p>
+      </div>
+    </div>
+    <div class="step">
+      <span class="step-n" style="color:var(--v-purple);">22</span>
+      <div class="step-body">
+        <strong>Compare Direct API vs Vertex AI — Same Prompt, Both Methods</strong>
+        <p>Run <code>task22_compare.py</code> from this guide. Both methods should produce semantically equivalent responses. Key insight: the difference is authentication and platform, not model capability. Document the 4 lines that changed between the two implementations.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="alert alert-ok">
+    <span class="alert-icon">✅</span>
+    <div class="alert-body">
+      <strong>Your full AI stack after completing both guides</strong>
+      <p>Gemini API Direct → local dev and rapid iteration. Vertex AI → deployed Cloud Run service with service account auth. Agent Builder → document knowledge base for your compliance agents. Model Garden → awareness of alternatives if you need to switch models post-hackathon. Secret Manager (from Guide 1) → all credentials secured. GitHub Actions (from Guide 1) → auto-deploys every push to main.</p>
+    </div>
+  </div>
+
+  <!-- ARCHITECTURE SUMMARY -->
+  <div class="why indigo">
+    <div class="why-label">↳ Complete System Architecture — Your Hackathon Stack</div>
+    <p>
+      <strong style="color:var(--white);">Local:</strong> FastAPI + Gemini API Direct + python-dotenv → <code>uvicorn main:app --reload</code><br><br>
+      <strong style="color:var(--white);">Deployed:</strong> Cloud Run → Vertex AI (same Gemini models, service account auth) → Secret Manager (API keys) → Artifact Registry (Docker image) → GitHub Actions (CI/CD)<br><br>
+      <strong style="color:var(--white);">Agent knowledge:</strong> Vertex AI Agent Builder → indexed PDFs (FBR, UCP 600, PIFFA) → searched via <code>discoveryengine</code> client → injected as context into Gemini prompts<br><br>
+      <strong style="color:var(--white);">Live data:</strong> Python function tools (FX rates, news, shipping APIs) → called by Gemini automatically → returned as context → Gemini synthesises final answer
+    </p>
+  </div>
+</div>
+
+</main>
+
+<footer>
+  Vertex AI Complete Guide &nbsp;·&nbsp; <strong>Agentic AI Hackathon 2026</strong> &nbsp;·&nbsp; Gemini on Vertex · Agent Builder · RAG Search · Model Garden · Tasks 18–22
+</footer>
+</body>
+</html>

@@ -1,0 +1,1356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GCP Cloud Run — FastAPI Deployment Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:        #080b0f;
+  --surface:   #0e1318;
+  --card:      #111720;
+  --raised:    #161d27;
+  --border:    #1e2a38;
+  --border2:   #263040;
+  --gcp-blue:  #4285f4;
+  --gcp-green: #34a853;
+  --gcp-amber: #fbbc04;
+  --gcp-red:   #ea4335;
+  --cyan:      #22d3ee;
+  --purple:    #a78bfa;
+  --text:      #cbd5e1;
+  --text-dim:  #64748b;
+  --white:     #f1f5f9;
+  --code-bg:   #060a0e;
+  --mono: 'IBM Plex Mono', monospace;
+  --sans: 'DM Sans', sans-serif;
+  --display: 'Bebas Neue', sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:var(--sans);
+  font-size:15px;
+  line-height:1.7;
+}
+
+/* ─── SCANLINE TEXTURE ─── */
+body::before{
+  content:'';
+  position:fixed;inset:0;
+  background:repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,0,0,.08) 2px,
+    rgba(0,0,0,.08) 4px
+  );
+  pointer-events:none;
+  z-index:9999;
+}
+
+/* ─── HEADER ─── */
+header{
+  background: linear-gradient(160deg,#0a1220 0%,#080b0f 50%);
+  border-bottom:1px solid var(--border);
+  padding:56px 48px 44px;
+  position:relative;
+  overflow:hidden;
+}
+header::after{
+  content:'';
+  position:absolute;
+  right:-80px;top:-80px;
+  width:400px;height:400px;
+  background:radial-gradient(circle, rgba(66,133,244,.12) 0%, transparent 70%);
+  pointer-events:none;
+}
+.h-eyebrow{
+  font-family:var(--mono);
+  font-size:10px;
+  letter-spacing:3px;
+  color:var(--gcp-blue);
+  text-transform:uppercase;
+  margin-bottom:14px;
+  display:flex;align-items:center;gap:10px;
+}
+.h-eyebrow::before{
+  content:'';
+  width:24px;height:1px;
+  background:var(--gcp-blue);
+}
+header h1{
+  font-family:var(--display);
+  font-size:clamp(38px,5vw,72px);
+  letter-spacing:2px;
+  color:var(--white);
+  line-height:1;
+  margin-bottom:16px;
+}
+header h1 em{color:var(--gcp-blue);font-style:normal;}
+.h-sub{
+  color:var(--text-dim);
+  font-size:14px;
+  max-width:580px;
+  line-height:1.6;
+  margin-bottom:28px;
+}
+.h-tags{display:flex;flex-wrap:wrap;gap:8px;}
+.tag{
+  font-family:var(--mono);
+  font-size:10px;
+  letter-spacing:.5px;
+  padding:4px 11px;
+  border-radius:3px;
+  border:1px solid;
+}
+.tag-b{color:var(--gcp-blue); border-color:rgba(66,133,244,.3);background:rgba(66,133,244,.07);}
+.tag-g{color:var(--gcp-green);border-color:rgba(52,168,83,.3); background:rgba(52,168,83,.07);}
+.tag-a{color:var(--gcp-amber);border-color:rgba(251,188,4,.3); background:rgba(251,188,4,.07);}
+.tag-r{color:var(--gcp-red);  border-color:rgba(234,67,53,.3); background:rgba(234,67,53,.07);}
+.tag-c{color:var(--cyan);     border-color:rgba(34,211,238,.3);background:rgba(34,211,238,.07);}
+.tag-p{color:var(--purple);   border-color:rgba(167,139,250,.3);background:rgba(167,139,250,.07);}
+
+/* ─── NAV ─── */
+nav{
+  background:var(--surface);
+  border-bottom:1px solid var(--border);
+  padding:0 48px;
+  display:flex;gap:0;
+  overflow-x:auto;
+}
+nav a{
+  font-family:var(--mono);
+  font-size:11px;
+  letter-spacing:.5px;
+  color:var(--text-dim);
+  text-decoration:none;
+  padding:14px 20px;
+  border-bottom:2px solid transparent;
+  white-space:nowrap;
+  transition:all .2s;
+}
+nav a:hover{color:var(--white);border-color:var(--gcp-blue);}
+nav a.n1{color:var(--gcp-blue);}
+nav a.n2{color:var(--gcp-green);}
+nav a.n3{color:var(--gcp-amber);}
+nav a.n4{color:var(--purple);}
+
+/* ─── MAIN ─── */
+main{max-width:980px;margin:0 auto;padding:60px 32px 100px;}
+
+/* ─── SECTION ─── */
+.section{margin-bottom:80px;}
+.section-head{
+  display:flex;align-items:flex-start;gap:18px;
+  margin-bottom:32px;
+  padding-bottom:20px;
+  border-bottom:1px solid var(--border);
+}
+.s-num{
+  font-family:var(--display);
+  font-size:52px;
+  line-height:1;
+  flex-shrink:0;
+  margin-top:-6px;
+}
+.s-num.c1{color:var(--gcp-blue);}
+.s-num.c2{color:var(--gcp-green);}
+.s-num.c3{color:var(--gcp-amber);}
+.s-num.c4{color:var(--purple);}
+.s-head-text h2{
+  font-family:var(--display);
+  font-size:26px;
+  letter-spacing:1px;
+  color:var(--white);
+  line-height:1.2;
+}
+.s-head-text p{
+  color:var(--text-dim);
+  font-size:13px;
+  margin-top:5px;
+}
+
+/* ─── WHY BOX ─── */
+.why{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-left:3px solid var(--gcp-blue);
+  border-radius:0 8px 8px 0;
+  padding:16px 20px;
+  margin-bottom:24px;
+  font-size:13.5px;
+}
+.why.green {border-left-color:var(--gcp-green);}
+.why.amber {border-left-color:var(--gcp-amber);}
+.why.purple{border-left-color:var(--purple);}
+.why.red   {border-left-color:var(--gcp-red);}
+.why.cyan  {border-left-color:var(--cyan);}
+.why-label{
+  font-family:var(--mono);
+  font-size:9px;
+  letter-spacing:2px;
+  color:var(--gcp-blue);
+  text-transform:uppercase;
+  margin-bottom:6px;
+}
+.why.green  .why-label{color:var(--gcp-green);}
+.why.amber  .why-label{color:var(--gcp-amber);}
+.why.purple .why-label{color:var(--purple);}
+.why.red    .why-label{color:var(--gcp-red);}
+.why.cyan   .why-label{color:var(--cyan);}
+.why p{color:var(--text);line-height:1.6;}
+
+/* ─── CODE BLOCK ─── */
+.code-wrap{margin-bottom:20px;}
+.code-label{
+  background:var(--raised);
+  border:1px solid var(--border);
+  border-bottom:none;
+  border-radius:6px 6px 0 0;
+  padding:8px 14px;
+  display:flex;align-items:center;gap:10px;
+  font-family:var(--mono);
+  font-size:10px;
+  letter-spacing:1px;
+  color:var(--text-dim);
+}
+.cl-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.cl-b{background:var(--gcp-blue);}
+.cl-g{background:var(--gcp-green);}
+.cl-a{background:var(--gcp-amber);}
+.cl-p{background:var(--purple);}
+.cl-c{background:var(--cyan);}
+.cl-r{background:var(--gcp-red);}
+pre{
+  background:var(--code-bg);
+  border:1px solid var(--border);
+  border-radius:0 0 6px 6px;
+  padding:20px 18px;
+  overflow-x:auto;
+  font-family:var(--mono);
+  font-size:12.5px;
+  line-height:1.75;
+}
+code{font-family:var(--mono);font-size:12.5px;}
+
+/* tokens */
+.kw {color:#c792ea;}
+.fn {color:#82aaff;}
+.st {color:#c3e88d;}
+.cm {color:#546e7a;font-style:italic;}
+.nm {color:#f78c6c;}
+.cl {color:#ffcb6b;}
+.dc {color:#c792ea;}
+.op {color:#89ddff;}
+.vr {color:#eeffff;}
+.hl {background:rgba(66,133,244,.12);display:block;margin:0 -18px;padding:0 18px;}
+.hl-g{background:rgba(52,168,83,.1); display:block;margin:0 -18px;padding:0 18px;}
+.hl-a{background:rgba(251,188,4,.08);display:block;margin:0 -18px;padding:0 18px;}
+
+/* ─── STEP ─── */
+.steps{display:flex;flex-direction:column;gap:14px;margin-bottom:24px;}
+.step{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:16px 18px;
+  display:flex;gap:16px;
+}
+.step-n{
+  font-family:var(--display);
+  font-size:26px;
+  color:var(--border2);
+  flex-shrink:0;
+  line-height:1;
+  margin-top:2px;
+  min-width:30px;
+}
+.step-body strong{
+  display:block;
+  color:var(--white);
+  font-size:14px;
+  margin-bottom:4px;
+}
+.step-body p{color:var(--text-dim);font-size:13px;line-height:1.55;}
+.step-body code{
+  background:rgba(255,255,255,.06);
+  padding:1px 5px;
+  border-radius:3px;
+  color:var(--cyan);
+  font-size:11.5px;
+}
+
+/* ─── ALERT ─── */
+.alert{
+  border-radius:6px;
+  padding:14px 18px;
+  margin-bottom:20px;
+  display:flex;gap:12px;
+  font-size:13px;
+  align-items:flex-start;
+}
+.alert-warn{background:rgba(251,188,4,.07);border:1px solid rgba(251,188,4,.25);}
+.alert-info{background:rgba(66,133,244,.07);border:1px solid rgba(66,133,244,.25);}
+.alert-danger{background:rgba(234,67,53,.07);border:1px solid rgba(234,67,53,.25);}
+.alert-ok{background:rgba(52,168,83,.07);border:1px solid rgba(52,168,83,.25);}
+.alert-icon{font-size:16px;flex-shrink:0;margin-top:1px;}
+.alert-body strong{display:block;color:var(--white);margin-bottom:3px;font-size:13px;}
+.alert-body p{color:var(--text-dim);line-height:1.5;}
+.alert-body code{
+  background:rgba(255,255,255,.08);
+  padding:1px 5px;
+  border-radius:3px;
+  color:var(--cyan);
+  font-size:11px;
+  font-family:var(--mono);
+}
+
+/* ─── FLOW DIAGRAM ─── */
+.flow{
+  display:flex;align-items:center;flex-wrap:wrap;gap:0;
+  margin:24px 0;
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:20px 24px;
+}
+.flow-box{
+  background:var(--raised);
+  border:1px solid var(--border2);
+  border-radius:6px;
+  padding:10px 16px;
+  text-align:center;
+  min-width:120px;
+}
+.flow-box .fb-label{
+  font-family:var(--mono);
+  font-size:9px;
+  letter-spacing:1.5px;
+  text-transform:uppercase;
+  color:var(--text-dim);
+  margin-bottom:4px;
+}
+.flow-box .fb-name{
+  font-weight:600;
+  color:var(--white);
+  font-size:13px;
+}
+.flow-arrow{
+  font-family:var(--mono);
+  color:var(--border2);
+  font-size:20px;
+  padding:0 12px;
+  flex-shrink:0;
+}
+.flow-box.fb-blue  {border-color:rgba(66,133,244,.4);}
+.flow-box.fb-green {border-color:rgba(52,168,83,.4);}
+.flow-box.fb-amber {border-color:rgba(251,188,4,.4);}
+.flow-box.fb-purple{border-color:rgba(167,139,250,.4);}
+
+/* ─── COMPARE ─── */
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;}
+@media(max-width:640px){.compare{grid-template-columns:1fr;}}
+.compare-card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:8px;
+  overflow:hidden;
+}
+.cc-head{
+  padding:10px 14px;
+  font-family:var(--mono);
+  font-size:10px;
+  letter-spacing:1px;
+  border-bottom:1px solid var(--border);
+  display:flex;gap:8px;align-items:center;
+}
+
+/* ─── TABLE ─── */
+table{width:100%;border-collapse:collapse;margin-bottom:20px;font-size:13px;}
+th{
+  font-family:var(--mono);
+  font-size:9px;
+  letter-spacing:2px;
+  text-transform:uppercase;
+  color:var(--text-dim);
+  padding:10px 14px;
+  border-bottom:1px solid var(--border);
+  text-align:left;
+}
+td{
+  padding:9px 14px;
+  border-bottom:1px solid rgba(255,255,255,.04);
+  vertical-align:top;
+  line-height:1.5;
+  color:var(--text);
+}
+tr:last-child td{border-bottom:none;}
+td code{
+  font-family:var(--mono);
+  font-size:11px;
+  background:rgba(255,255,255,.05);
+  padding:1px 5px;
+  border-radius:3px;
+  color:var(--cyan);
+}
+.td-g{color:var(--gcp-green);}
+.td-a{color:var(--gcp-amber);}
+.td-r{color:var(--gcp-red);}
+
+/* ─── DIVIDER ─── */
+hr{border:none;height:1px;background:linear-gradient(to right,transparent,var(--border),transparent);margin:60px 0;}
+
+/* ─── FOOTER ─── */
+footer{
+  text-align:center;
+  color:var(--text-dim);
+  font-family:var(--mono);
+  font-size:11px;
+  padding:32px;
+  border-top:1px solid var(--border);
+  letter-spacing:.5px;
+}
+footer strong{color:var(--gcp-blue);}
+
+/* inline code in prose */
+p code, li code{
+  font-family:var(--mono);
+  font-size:11.5px;
+  background:rgba(255,255,255,.06);
+  padding:1px 5px;
+  border-radius:3px;
+  color:var(--cyan);
+}
+ul{margin:10px 0 16px 20px;}
+li{margin-bottom:6px;color:var(--text);font-size:13.5px;line-height:1.55;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="h-eyebrow">// Google Cloud Platform · FastAPI · Production Deployment</div>
+  <h1>DEPLOY TO<br><em>CLOUD RUN</em></h1>
+  <p class="h-sub">A four-objective engineering guide: CLI infrastructure, serverless deployment, secret management, and CI/CD with Workload Identity Federation. Designed around your existing FastAPI project.</p>
+  <div class="h-tags">
+    <span class="tag tag-b">01 — gcloud CLI</span>
+    <span class="tag tag-g">02 — Cloud Run + Docker</span>
+    <span class="tag tag-a">03 — Secret Manager</span>
+    <span class="tag tag-p">04 — GitHub Actions CI/CD</span>
+    <span class="tag tag-c">Free Tier Safe</span>
+    <span class="tag tag-r">Windows Compatible</span>
+  </div>
+</header>
+
+<nav>
+  <a href="#obj1" class="n1">01 · Infrastructure CLI</a>
+  <a href="#obj2" class="n2">02 · Cloud Run Deploy</a>
+  <a href="#obj3" class="n3">03 · Secret Manager</a>
+  <a href="#obj4" class="n4">04 · CI/CD Pipeline</a>
+</nav>
+
+<main>
+
+<!-- ══════════════════════════════════════════════════════════
+     PREREQUISITE — PROJECT STRUCTURE
+══════════════════════════════════════════════════════════ -->
+<div class="section" style="margin-top:0;padding-top:0;">
+  <div class="why cyan">
+    <div class="why-label">⊕ Before You Start — Your Project Structure</div>
+    <p>This guide assumes your FastAPI project lives at <code>C:\Users\7480\Desktop\python-codes\Project_test\</code>. By the end you will add these files to it. <strong>Do not put them inside the <code>venv/</code> folder.</strong></p>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-label"><span class="cl-dot cl-c"></span>TARGET DIRECTORY STRUCTURE — add these files to your existing project</div>
+    <pre><span class="cm">Project_test/
+├── venv/                   ← your existing venv (unchanged)</span>
+<span class="hl-g"><span class="cl">├── main.py                 ← your existing FastAPI app</span></span>
+<span class="hl-g"><span class="cl">├── Dockerfile              ← NEW: tells Cloud Run how to containerize</span></span>
+<span class="hl-g"><span class="cl">├── .dockerignore           ← NEW: keeps venv/ out of the image</span></span>
+<span class="hl-g"><span class="cl">├── requirements.txt        ← NEW: generated from pip freeze</span></span>
+<span class="hl-g"><span class="cl">├── .env                    ← NEW: local secrets only (never pushed)</span></span>
+<span class="hl-g"><span class="cl">├── .gitignore              ← NEW: excludes .env, venv/, __pycache__</span></span>
+<span class="hl-g"><span class="cl">└── .github/
+    └── workflows/
+        └── deploy.yml      ← NEW: CI/CD pipeline</span></span></pre>
+  </div>
+</div>
+
+<hr>
+
+<!-- ══════════════════════════════════════════════════════════
+     OBJECTIVE 01 — CLI & API ENABLEMENT
+══════════════════════════════════════════════════════════ -->
+<div class="section" id="obj1">
+  <div class="section-head">
+    <div class="s-num c1">01</div>
+    <div class="s-head-text">
+      <h2>INFRASTRUCTURE AS CODE — GCLOUD CLI</h2>
+      <p>Enabling APIs, authenticating, and configuring your project environment from the terminal</p>
+    </div>
+  </div>
+
+  <div class="why">
+    <div class="why-label">↳ Why This Step Exists</div>
+    <p>GCP services are disabled by default to prevent accidental usage and billing. <strong>Enabling an API</strong> is like flipping a circuit breaker — nothing can talk to Cloud Run, Artifact Registry, or Secret Manager until you explicitly activate the service. This is not optional; without it every subsequent command will return a <code>SERVICE_DISABLED</code> error. The CLI approach is faster than the Console and is version-controllable — you can script your entire environment setup as an onboarding script for teammates.</p>
+  </div>
+
+  <!-- AUTH & INIT -->
+  <h3 style="color:var(--white);font-size:16px;margin-bottom:14px;font-family:var(--mono);letter-spacing:1px;">STEP A — AUTHENTICATE AND SET PROJECT</h3>
+
+  <div class="code-wrap">
+    <div class="code-label"><span class="cl-dot cl-b"></span>POWERSHELL / CMD — run in order</div>
+    <pre><span class="cm"># 1. Open Google Cloud SDK Shell (installed with the SDK)</span>
+<span class="cm">#    OR use PowerShell if gcloud is in your PATH</span>
+
+<span class="cm"># 2. Authenticate — opens a browser window</span>
+<span class="fn">gcloud</span> auth login
+
+<span class="cm"># 3. Set application-default credentials (needed for local SDK calls)</span>
+<span class="fn">gcloud</span> auth application-default login
+
+<span class="cm"># 4. List your projects to find your PROJECT_ID</span>
+<span class="fn">gcloud</span> projects list
+
+<span class="cm"># 5. Set the active project (replace with YOUR actual project ID)</span>
+<span class="fn">gcloud</span> config set project <span class="cl">YOUR_PROJECT_ID</span>
+
+<span class="cm"># 6. Set default region — us-central1 has the most free tier quota</span>
+<span class="fn">gcloud</span> config set run/region us-central1
+
+<span class="cm"># 7. Confirm your config</span>
+<span class="fn">gcloud</span> config list</pre>
+  </div>
+
+  <div class="alert alert-warn">
+    <span class="alert-icon">⚠️</span>
+    <div class="alert-body">
+      <strong>Windows: 'gcloud' is not recognized</strong>
+      <p>The SDK installer adds gcloud to PATH only if you checked that option. Fix: <strong>Open "Google Cloud SDK Shell"</strong> from Start Menu instead of regular PowerShell. Alternatively, add <code>C:\Users\YOUR_USER\AppData\Local\Google\Cloud SDK\google-cloud-sdk\bin</code> to your system PATH manually via System Properties → Environment Variables.</p>
+    </div>
+  </div>
+
+  <div class="alert alert-warn">
+    <span class="alert-icon">⚠️</span>
+    <div class="alert-body">
+      <strong>Windows: Browser doesn't open for auth login</strong>
+      <p>Run <code>gcloud auth login --no-launch-browser</code>. It prints a URL — copy it into any browser manually, authenticate, then paste the authorization code back into the terminal.</p>
+    </div>
+  </div>
+
+  <!-- ENABLE APIS -->
+  <h3 style="color:var(--white);font-size:16px;margin:28px 0 14px;font-family:var(--mono);letter-spacing:1px;">STEP B — ENABLE THE THREE REQUIRED APIs</h3>
+
+  <div class="why">
+    <div class="why-label">↳ What Each API Does</div>
+    <p><strong style="color:var(--white);">run.googleapis.com</strong> — the Cloud Run service itself. Without it, <code>gcloud run deploy</code> does nothing.<br>
+    <strong style="color:var(--white);">artifactregistry.googleapis.com</strong> — stores your Docker image. Cloud Run pulls from here, not from Docker Hub. It's private, faster within GCP, and free for 500MB.<br>
+    <strong style="color:var(--white);">secretmanager.googleapis.com</strong> — the vault for your API keys and MongoDB URIs. Never store these in environment variables passed directly — use Secret Manager instead.</p>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-label"><span class="cl-dot cl-b"></span>POWERSHELL — enable all three in one command</div>
+    <pre><span class="fn">gcloud</span> services enable \
+  run.googleapis.com \
+  artifactregistry.googleapis.com \
+  secretmanager.googleapis.com
+
+<span class="cm"># On Windows CMD (no backslash continuation) — use this instead:</span>
+<span class="fn">gcloud</span> services enable run.googleapis.com artifactregistry.googleapis.com secretmanager.googleapis.com</pre>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-label"><span class="cl-dot cl-g"></span>VERIFY — confirm all three are active</div>
+    <pre><span class="fn">gcloud</span> services list --enabled --filter=<span class="st">"name:(run OR artifactregistry OR secretmanager)"</span>
+
+<span class="cm"># Expected output:</span>
+<span class="cm"># NAME                              TITLE</span>
+<span class="cm"># artifactregistry.googleapis.com  Artifact Registry API</span>
+<span class="cm"># run.googleapis.com               Cloud Run Admin API</span>
+<span class="cm"># secretmanager.googleapis.com     Secret Manager API</span></pre>
+  </div>
+
+  <!-- CREATE ARTIFACT REGISTRY REPO -->
+  <h3 style="color:var(--white);font-size:16px;margin:28px 0 14px;font-family:var(--mono);letter-spacing:1px;">STEP C — CREATE AN ARTIFACT REGISTRY REPOSITORY</h3>
+
+  <div class="code-wrap">
+    <div class="code-label"><span class="cl-dot cl-b"></span>POWERSHELL — create the Docker image repository</div>
+    <pre><span class="fn">gcloud</span> artifacts repositories create project-test-repo \
+  --repository-format=docker \
+  --location=us-central1 \
+  --description=<span class="st">"Docker images for Project Test FastAPI"</span>
+
+<span class="cm"># Verify it was created:</span>
+<span class="fn">gcloud</span> artifacts repositories list --location=us-central1
+
+<span class="cm"># Configure Docker to authenticate to GCP (run once per machine):</span>
+<span class="fn">gcloud</span> auth configure-docker us-central1-docker.pkg.dev</pre>
+  </div>
+
+  <div class="alert alert-info">
+    <span class="alert-icon">ℹ️</span>
+    <div class="alert-body">
+      <strong>Your full image path will be:</strong>
+      <p><code>us-central1-docker.pkg.dev/YOUR_PROJECT_ID/project-test-repo/project-test:latest</code><br>This is the URL you'll reference in every Docker build and Cloud Run deploy command. Bookmark it.</p>
+    </div>
+  </div>
+
+  <!-- WINDOWS TROUBLESHOOTING -->
+  <h3 style="color:var(--white);font-size:16px;margin:28px 0 14px;font-family:var(--mono);letter-spacing:1px;">WINDOWS TROUBLESHOOTING REFERENCE</h3>
+
+  <table>
+    <thead><tr><th>Error</th><th>Cause</th><th>Fix</th></tr></thead>
+    <tbody>
+      <tr><td><code>gcloud: command not found</code></td><td>PATH not set</td><td>Open "Google Cloud SDK Shell" from Start Menu</td></tr>
+      <tr><td><code>PERMISSION_DENIED on services enable</code></td><td>Not Project Owner/Editor</td><td>Go to IAM Console → confirm your account has Editor role</td></tr>
+      <tr><td><code>Docker not found</code> on configure-docker</td><td>Docker Desktop not installed</td><td>Install Docker Desktop for Windows; enable WSL2 backend</td></tr>
+      <tr><td><code>Error refreshing token</code></td><td>Auth token expired</td><td>Run <code>gcloud auth login</code> again</td></tr>
+      <tr><td>Backslash line continuation fails</td><td>CMD doesn't support <code>\</code></td><td>Use PowerShell or write command on one line</td></tr>
+      <tr><td><code>quota exceeded</code> immediately</td><td>Wrong project set</td><td>Run <code>gcloud config get project</code> to verify</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<hr>
+
+<!-- ══════════════════════════════════════════════════════════
+     OBJECTIVE 02 — CLOUD RUN DEPLOYMENT
+══════════════════════════════════════════════════════════ -->
+<div class="section" id="obj2">
+  <div class="section-head">
+    <div class="s-num c2">02</div>
+    <div class="s-head-text">
+      <h2>SERVERLESS DEPLOYMENT — CLOUD RUN</h2>
+      <p>Dockerfile → Artifact Registry → Cloud Run. The full pipeline explained and implemented.</p>
+    </div>
+  </div>
+
+  <div class="why green">
+    <div class="why-label">↳ Why Cloud Run (Not App Engine, Not GKE)</div>
+    <p>Cloud Run is <strong>request-driven and scales to zero</strong> — you pay nothing when no requests come in. For a hackathon or test project, this means your free tier lasts far longer. App Engine always has one instance running (minimum billing). GKE requires running nodes 24/7. Cloud Run is the right choice: it handles your FastAPI container with zero infrastructure management, auto-scales on demand, and stays within free tier for low-traffic projects (first 2 million requests/month are free).</p>
+  </div>
+
+  <!-- PIPELINE DIAGRAM -->
+  <div class="flow">
+    <div class="flow-box fb-blue">
+      <div class="fb-label">Your Machine</div>
+      <div class="fb-name">main.py</div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box fb-blue">
+      <div class="fb-label">Docker Build</div>
+      <div class="fb-name">Image</div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box fb-amber">
+      <div class="fb-label">Artifact Registry</div>
+      <div class="fb-name">Image Store</div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box fb-green">
+      <div class="fb-label">Cloud Run</div>
+      <div class="fb-name">Live Service</div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box fb-purple">
+      <div class="fb-label">HTTPS URL</div>
+      <div class="fb-name">Public API</div>
+    </div>
+  </div>
+
+  <p style="color:var(--text-dim);font-size:13px;margin-bottom:28px;">The relationship: <strong style="color:var(--white);">Docker</strong> packages your app + Python runtime into a portable image. <strong style="color:var(--white);">Artifact Registry</strong> is GCP's private Docker Hub — it stores that image inside Google's network (faster pulls, no rate limits). <strong style="color:var(--white);">Cloud Run</strong> pulls that image and runs it as a serverless container, giving you an HTTPS URL automatically.</p>
+
+  <!-- STEP 1: requirements.txt -->
+  <h3 style="color:var(--white);font-size:16px;margin-bottom:14px;font-family:var(--mono);letter-spacing:1px;">STEP A — GENERATE requirements.txt</h3>
+
+  <div class="code-wrap">
+    <div class="code-label"><span class="cl-dot cl-g"></span>POWERSHELL — inside your activated venv</div>
+    <pre><span class="cm"># Activate your existing venv first</span>
+.\venv\Scripts\activate
+
+<span class="cm"># Generate requirements — locks exact versions</span>
+pip freeze > requirements.txt
+
+<span class="cm"># Verify it contains fastapi and uvicorn at minimum</span>
+<span class="fn">type</span> requirements.txt</pre>
+  </div>
+
+  <!-- STEP 2: Dockerfile -->
+  <h3 style="color:var(--white);font-size:16px;margin:28px 0 14px;font-family:var(--mono);letter-spacing:1px;">STEP B — WRITE THE DOCKERFILE</h3>
+
+  <div class="why green">
+    <div class="why-label">↳ Why Each Line Exists</div>
+    <p>The Dockerfile is a recipe. Cloud Run doesn't know what Python is — it only knows how to run containers. The Dockerfile teaches it: "start from a Python image, install these packages, copy this code, then start uvicorn on port 8080." Port 8080 is mandatory for Cloud Run (not 8000, not 3000).</p>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-label"><span class="cl-dot cl-g"></span>Dockerfile — place in Project_test/ root (same level as main.py)</div>
+    <pre><span class="cm"># ── Base image: slim = smaller image = faster cold start ──</span>
+<span class="kw">FROM</span> python:3.11-slim
+
+<span class="cm"># ── Working directory inside the container ──</span>
+<span class="kw">WORKDIR</span> /app
+
+<span class="cm"># ── Install deps BEFORE copying code (Docker layer caching) ──</span>
+<span class="cm"># If only main.py changes, this layer is reused — faster builds</span>
+<span class="kw">COPY</span> requirements.txt .
+<span class="kw">RUN</span> pip install --no-cache-dir -r requirements.txt
+
+<span class="cm"># ── Copy your application code ──</span>
+<span class="kw">COPY</span> main.py .
+
+<span class="cm"># ── Cloud Run REQUIRES port 8080 ──</span>
+<span class="cm"># The PORT env var is injected by Cloud Run automatically</span>
+<span class="kw">ENV</span> PORT 8080
+<span class="kw">EXPOSE</span> 8080
+
+<span class="cm"># ── Start uvicorn — listen on 0.0.0.0 so Cloud Run can reach it ──</span>
+<span class="kw">CMD</span> ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080"]</pre>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-label"><span class="cl-dot cl-g"></span>.dockerignore — prevents venv from bloating your image</div>
+    <pre>venv/
+.env
+__pycache__/
+*.pyc
+*.pyo
+.git/
+.gitignore
+*.md</pre>
+  </div>
+
+  <!-- STEP 3: main.py hello world -->
+  <h3 style="color:var(--white);font-size:16px;margin:28px 0 14px;font-family:var(--mono);letter-spacing:1px;">STEP C — FASTAPI APP WITH ENVIRONMENT VARIABLE HANDLING</h3>
+
+  <div class="why green">
+    <div class="why-label">↳ Why Environment Variables for MERN-style Architecture</div>
+    <p>In a MERN stack the Node.js backend uses <code>process.env.MONGO_URI</code>. The Python/FastAPI equivalent is <code>os.getenv("MONGO_URI")</code>. The pattern is identical: <strong>never hardcode connection strings</strong>. Locally, they come from your <code>.env</code> file. In Cloud Run, they come from Secret Manager or environment variable injection at deploy time. The <code>python-dotenv</code> package bridges both worlds with zero code change.</p>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-label"><span class="cl-dot cl-g"></span>main.py — production-ready FastAPI with env var handling</div>
+    <pre><span class="kw">import</span> os
+<span class="kw">from</span> fastapi <span class="kw">import</span> FastAPI
+<span class="kw">from</span> dotenv <span class="kw">import</span> load_dotenv
+
+<span class="cm"># ── Loads .env locally; has NO effect when deployed to Cloud Run ──</span>
+<span class="cm"># (Cloud Run injects vars directly — no .env file exists there)</span>
+load_dotenv()
+
+app = <span class="cl">FastAPI</span>(
+    title=<span class="st">"Project Test API"</span>,
+    version=<span class="st">"1.0.0"</span>
+)
+
+<span class="cm"># ── Read environment variables ──</span>
+<span class="cm"># os.getenv(key, default) — second arg is fallback if var not set</span>
+MONGO_URI     = os.<span class="fn">getenv</span>(<span class="st">"MONGO_URI"</span>,     <span class="st">"mongodb://localhost:27017"</span>)
+APP_ENV       = os.<span class="fn">getenv</span>(<span class="st">"APP_ENV"</span>,       <span class="st">"development"</span>)
+NEWS_API_KEY  = os.<span class="fn">getenv</span>(<span class="st">"NEWS_API_KEY"</span>,  <span class="st">""</span>)
+
+<span class="cm"># ── Health check — Cloud Run calls this to verify your app started ──</span>
+<span class="dc">@app</span>.get(<span class="st">"/"</span>)
+<span class="kw">async def</span> <span class="fn">health_check</span>():
+    <span class="kw">return</span> {
+        <span class="st">"status"</span>: <span class="st">"ok"</span>,
+        <span class="st">"environment"</span>: APP_ENV,
+        <span class="cm"># Never return the actual secret value — just confirm it's set</span>
+        <span class="st">"mongo_configured"</span>: bool(MONGO_URI),
+    }
+
+<span class="dc">@app</span>.get(<span class="st">"/hello"</span>)
+<span class="kw">async def</span> <span class="fn">hello_world</span>():
+    <span class="kw">return</span> {<span class="st">"message"</span>: <span class="st">"Hello from Cloud Run!"</span>, <span class="st">"env"</span>: APP_ENV}
+
+<span class="cm"># ── LOCAL ONLY — uvicorn from IDE or python main.py ──</span>
+<span class="kw">if</span> __name__ == <span class="st">"__main__"</span>:
+    <span class="kw">import</span> uvicorn
+    uvicorn.<span class="fn">run</span>(<span class="st">"main:app"</span>, host=<span class="st">"0.0.0.0"</span>,
+                port=<span class="nm">8000</span>, reload=<span class="kw">True</span>)</pre>
+  </div>
+
+  <!-- STEP 4: BUILD & DEPLOY -->
+  <h3 style="color:var(--white);font-size:16px;margin:28px 0 14px;font-family:var(--mono);letter-spacing:1px;">STEP D — BUILD, PUSH, AND DEPLOY</h3>
+
+  <div class="code-wrap">
+    <div class="code-label"><span class="cl-dot cl-g"></span>POWERSHELL — run from Project_test/ directory</div>
+    <pre><span class="cm"># ── Set your variables (change these values) ──</span>
+$PROJECT_ID = <span class="st">"your-project-id"</span>
+$REGION     = <span class="st">"us-central1"</span>
+$REPO       = <span class="st">"project-test-repo"</span>
+$SERVICE    = <span class="st">"project-test"</span>
+$IMAGE      = <span class="st">"$REGION-docker.pkg.dev/$PROJECT_ID/$REPO/$SERVICE</span>:latest<span class="st">"</span>
+
+<span class="cm"># ── Option A: Build locally, push to Artifact Registry ──</span>
+<span class="cm"># (Requires Docker Desktop running on Windows)</span>
+docker build -t $IMAGE .
+docker push $IMAGE
+
+<span class="cm"># ── Option B: Cloud Build (no local Docker needed — recommended on Windows) ──</span>
+<span class="cm"># Uploads source code to GCP, builds the image there</span>
+gcloud builds submit --tag $IMAGE .
+
+<span class="cm"># ── Deploy to Cloud Run ──</span>
+gcloud run deploy $SERVICE `
+  --image $IMAGE `
+  --region $REGION `
+  --platform managed `
+  --allow-unauthenticated `
+  --memory 512Mi `
+  --cpu 1 `
+  --set-env-vars APP_ENV=production</pre>
+  </div>
+
+  <div class="alert alert-ok">
+    <span class="alert-icon">✅</span>
+    <div class="alert-body">
+      <strong>After deploy succeeds you'll see:</strong>
+      <p>Service URL: <code>https://project-test-XXXX-uc.a.run.app</code> — this is your live HTTPS endpoint. Visit <code>/docs</code> to see FastAPI's auto-generated Swagger UI running in production.</p>
+    </div>
+  </div>
+
+  <div class="alert alert-info">
+    <span class="alert-icon">ℹ️</span>
+    <div class="alert-body">
+      <strong>Free Tier Limits for Cloud Run</strong>
+      <p>2 million requests/month free · 360,000 GB-seconds of memory free · 180,000 vCPU-seconds free · First 500MB of Artifact Registry storage free. For a test project with low traffic you will pay $0/month.</p>
+    </div>
+  </div>
+</div>
+
+<hr>
+
+<!-- ══════════════════════════════════════════════════════════
+     OBJECTIVE 03 — SECRET MANAGER
+══════════════════════════════════════════════════════════ -->
+<div class="section" id="obj3">
+  <div class="section-head">
+    <div class="s-num c3">03</div>
+    <div class="s-head-text">
+      <h2>ENTERPRISE SECURITY — SECRET MANAGER</h2>
+      <p>Storing secrets, retrieving them in Python, and the IAM roles that prevent 403 errors</p>
+    </div>
+  </div>
+
+  <div class="why amber">
+    <div class="why-label">↳ Why Not Just Use Environment Variables?</div>
+    <p>You can pass env vars directly to Cloud Run at deploy time. The problem: they appear in plaintext in your shell history, in deployment logs, and in CI/CD pipeline output. Secret Manager encrypts secrets at rest with Google-managed keys, provides full audit logs of every access, allows secret rotation without redeployment, and lets you control which service accounts can read which secrets. For anything involving database credentials or API keys, Secret Manager is the professional standard — not optional.</p>
+  </div>
+
+  <!-- STORE THE SECRET -->
+  <h3 style="color:var(--white);font-size:16px;margin-bottom:14px;font-family:var(--mono);letter-spacing:1px;">STEP A — STORE SECRETS (THE "ekStore" PROCESS)</h3>
+
+  <div class="code-wrap">
+    <div class="code-label"><span class="cl-dot cl-a"></span>POWERSHELL — create and store secrets via CLI</div>
+    <pre><span class="cm"># ── Method 1: Create from a string value (PowerShell) ──</span>
+$MONGO_URI = <span class="st">"mongodb+srv://user:password@cluster.mongodb.net/mydb"</span>
+$MONGO_URI | gcloud secrets create MONGO_URI --data-file=-
+
+<span class="cm"># ── Method 2: Create from a file ──</span>
+<span class="cm"># First write your secret to a temp file:</span>
+<span class="st">"mongodb+srv://user:password@cluster.mongodb.net/mydb"</span> | Out-File -NoNewline mongo_uri.txt
+gcloud secrets create MONGO_URI --data-file=mongo_uri.txt
+Remove-Item mongo_uri.txt   <span class="cm"># delete immediately after</span>
+
+<span class="cm"># ── Add more secrets for your hackathon stack ──</span>
+<span class="st">"your_news_api_key_here"</span>       | gcloud secrets create NEWS_API_KEY     --data-file=-
+<span class="st">"your_anthropic_key_here"</span>      | gcloud secrets create ANTHROPIC_API_KEY --data-file=-
+<span class="st">"your_openweather_key_here"</span>    | gcloud secrets create OPENWEATHER_KEY   --data-file=-
+
+<span class="cm"># ── Verify secrets exist ──</span>
+gcloud secrets list
+
+<span class="cm"># ── View a secret's value (for debugging only) ──</span>
+gcloud secrets versions access latest --secret=<span class="st">"MONGO_URI"</span>
+
+<span class="cm"># ── Add a new version (rotate the secret) ──</span>
+<span class="st">"new_mongo_uri_value"</span> | gcloud secrets versions add MONGO_URI --data-file=-</pre>
+  </div>
+
+  <!-- IAM ROLES -->
+  <h3 style="color:var(--white);font-size:16px;margin:28px 0 14px;font-family:var(--mono);letter-spacing:1px;">STEP B — IAM PERMISSIONS (PREVENTING 403 FORBIDDEN)</h3>
+
+  <div class="why amber">
+    <div class="why-label">↳ Why You Get 403 Without This Step</div>
+    <p>Cloud Run runs your code under a <strong>Service Account identity</strong>. By default, this is the Compute Engine default service account. That account has no permission to read Secret Manager secrets. When your Python code calls the Secret Manager SDK, GCP checks: "does this service account have <code>secretmanager.secretAccessor</code>?" If not — 403 Forbidden. You must explicitly grant the role.</p>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-label"><span class="cl-dot cl-a"></span>POWERSHELL — create a dedicated service account and grant roles</div>
+    <pre><span class="cm"># ── Best practice: create a DEDICATED service account for your app ──</span>
+<span class="cm"># (Don't use the default compute service account — too many permissions)</span>
+
+$PROJECT_ID = <span class="st">"your-project-id"</span>
+$SA_NAME    = <span class="st">"project-test-sa"</span>
+$SA_EMAIL   = <span class="st">"$SA_NAME@$PROJECT_ID.iam.gserviceaccount.com"</span>
+
+<span class="cm"># 1. Create the service account</span>
+gcloud iam service-accounts create $SA_NAME `
+  --display-name=<span class="st">"Project Test Service Account"</span>
+
+<span class="cm"># 2. Grant Secret Manager accessor role — allows reading secret VALUES</span>
+gcloud projects add-iam-policy-binding $PROJECT_ID `
+  --member=<span class="st">"serviceAccount:$SA_EMAIL"</span> `
+  --role=<span class="st">"roles/secretmanager.secretAccessor"</span>
+
+<span class="cm"># 3. Redeploy Cloud Run using this service account</span>
+gcloud run deploy project-test `
+  --region us-central1 `
+  --service-account $SA_EMAIL `
+  --image <span class="st">"us-central1-docker.pkg.dev/$PROJECT_ID/project-test-repo/project-test:latest"</span></pre>
+  </div>
+
+  <table>
+    <thead><tr><th>IAM Role</th><th>What It Allows</th><th>When You Need It</th></tr></thead>
+    <tbody>
+      <tr><td><code>roles/secretmanager.secretAccessor</code></td><td>Read secret values (access versions)</td><td class="td-g">Always — your app needs this</td></tr>
+      <tr><td><code>roles/secretmanager.viewer</code></td><td>List secrets, see metadata (not values)</td><td>Admin/monitoring accounts only</td></tr>
+      <tr><td><code>roles/secretmanager.admin</code></td><td>Create, delete, manage all secrets</td><td class="td-r">Never assign to app service account</td></tr>
+      <tr><td><code>roles/run.invoker</code></td><td>Call your Cloud Run service via HTTP</td><td>CI/CD service account for testing</td></tr>
+      <tr><td><code>roles/artifactregistry.reader</code></td><td>Pull images from Artifact Registry</td><td>Cloud Run service account (usually auto-granted)</td></tr>
+    </tbody>
+  </table>
+
+  <!-- PYTHON SDK -->
+  <h3 style="color:var(--white);font-size:16px;margin:28px 0 14px;font-family:var(--mono);letter-spacing:1px;">STEP C — RETRIEVE SECRETS IN PYTHON</h3>
+
+  <div class="code-wrap">
+    <div class="code-label"><span class="cl-dot cl-a"></span>POWERSHELL — install the SDK in your venv</div>
+    <pre>.\venv\Scripts\activate
+pip install google-cloud-secret-manager python-dotenv
+pip freeze > requirements.txt   <span class="cm"># update requirements</span></pre>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-label"><span class="cl-dot cl-a"></span>secrets.py — dedicated module for secret retrieval (modular architecture)</div>
+    <pre><span class="kw">import</span> os
+<span class="kw">from</span> google.cloud <span class="kw">import</span> secretmanager
+<span class="kw">from</span> dotenv <span class="kw">import</span> load_dotenv
+
+load_dotenv()
+
+<span class="cm"># ── Cache client — creating it is expensive, reuse it ──</span>
+_sm_client = <span class="kw">None</span>
+
+<span class="kw">def</span> <span class="fn">_get_client</span>() -> secretmanager.<span class="cl">SecretManagerServiceClient</span>:
+    <span class="kw">global</span> _sm_client
+    <span class="kw">if</span> _sm_client <span class="kw">is None</span>:
+        _sm_client = secretmanager.<span class="cl">SecretManagerServiceClient</span>()
+    <span class="kw">return</span> _sm_client
+
+
+<span class="kw">def</span> <span class="fn">get_secret</span>(secret_id: str, version: str = <span class="st">"latest"</span>) -> str:
+    <span class="cm">"""
+    Retrieve a secret value from Google Cloud Secret Manager.
+
+    Locally: falls back to .env file via os.getenv first.
+    In Cloud Run: uses the Secret Manager API (service account auth).
+
+    Args:
+        secret_id: The secret name as created in Secret Manager (e.g. "MONGO_URI")
+        version:   Usually "latest". Can be a version number like "3".
+
+    Returns:
+        The secret value as a string.
+
+    Raises:
+        google.api_core.exceptions.NotFound: Secret doesn't exist.
+        google.api_core.exceptions.PermissionDenied: 403 — missing IAM role.
+    """</span>
+    <span class="cm"># ── Local development shortcut ──</span>
+    <span class="cm"># If running locally and .env has the var, use it directly.</span>
+    <span class="cm"># Avoids needing internet access for local dev.</span>
+    local_val = os.<span class="fn">getenv</span>(secret_id)
+    <span class="kw">if</span> local_val:
+        <span class="kw">return</span> local_val
+
+    <span class="cm"># ── Cloud Secret Manager path ──</span>
+    project_id = os.<span class="fn">getenv</span>(<span class="st">"GOOGLE_CLOUD_PROJECT"</span>) or os.<span class="fn">getenv</span>(<span class="st">"GCP_PROJECT"</span>)
+    <span class="kw">if not</span> project_id:
+        <span class="kw">raise</span> <span class="cl">ValueError</span>(
+            <span class="st">"GOOGLE_CLOUD_PROJECT env var not set. "</span>
+            <span class="st">"Add it to your .env or Cloud Run config."</span>
+        )
+
+    client = <span class="fn">_get_client</span>()
+    name   = <span class="st">f"projects/{project_id}/secrets/{secret_id}/versions/{version}"</span>
+
+    response = client.<span class="fn">access_secret_version</span>(request={<span class="st">"name"</span>: name})
+    <span class="kw">return</span> response.payload.data.<span class="fn">decode</span>(<span class="st">"UTF-8"</span>)
+
+
+<span class="cm"># ── Typed accessors — cleaner than raw string calls everywhere ──</span>
+<span class="kw">def</span> <span class="fn">get_mongo_uri</span>() -> str:
+    <span class="kw">return</span> <span class="fn">get_secret</span>(<span class="st">"MONGO_URI"</span>)
+
+<span class="kw">def</span> <span class="fn">get_news_api_key</span>() -> str:
+    <span class="kw">return</span> <span class="fn">get_secret</span>(<span class="st">"NEWS_API_KEY"</span>)
+
+<span class="kw">def</span> <span class="fn">get_anthropic_key</span>() -> str:
+    <span class="kw">return</span> <span class="fn">get_secret</span>(<span class="st">"ANTHROPIC_API_KEY"</span>)</pre>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-label"><span class="cl-dot cl-a"></span>main.py — using secrets.py in your FastAPI app</div>
+    <pre><span class="kw">import</span> os
+<span class="kw">from</span> fastapi <span class="kw">import</span> FastAPI
+<span class="kw">from</span> dotenv <span class="kw">import</span> load_dotenv
+<span class="kw">from</span> secrets <span class="kw">import</span> get_mongo_uri, get_news_api_key
+
+load_dotenv()
+app = <span class="cl">FastAPI</span>()
+
+<span class="cm"># ── Fetch secrets ONCE at startup, not on every request ──</span>
+<span class="cm"># This is the correct pattern — avoids API call on each request</span>
+MONGO_URI    = <span class="fn">get_mongo_uri</span>()
+NEWS_API_KEY = <span class="fn">get_news_api_key</span>()
+
+<span class="dc">@app</span>.get(<span class="st">"/"</span>)
+<span class="kw">async def</span> <span class="fn">health</span>():
+    <span class="kw">return</span> {
+        <span class="st">"status"</span>: <span class="st">"ok"</span>,
+        <span class="st">"mongo_connected"</span>: bool(MONGO_URI),
+        <span class="st">"news_api_ready"</span>:   bool(NEWS_API_KEY),
+    }</pre>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-label"><span class="cl-dot cl-a"></span>.env — local file (never committed to Git)</div>
+    <pre><span class="cm"># .env — used ONLY for local development</span>
+<span class="cm"># In Cloud Run, these come from Secret Manager</span>
+GOOGLE_CLOUD_PROJECT=your-project-id
+MONGO_URI=mongodb://localhost:27017/mydb
+NEWS_API_KEY=your_local_test_key
+ANTHROPIC_API_KEY=sk-ant-your-key</pre>
+  </div>
+
+  <div class="alert alert-danger">
+    <span class="alert-icon">🚫</span>
+    <div class="alert-body">
+      <strong>If you get 403 PermissionDenied — this is the checklist</strong>
+      <p>1. Run <code>gcloud run services describe project-test --region us-central1</code> and find the service account listed.<br>
+      2. Run <code>gcloud projects get-iam-policy YOUR_PROJECT_ID --flatten="bindings[].members" --filter="bindings.role=roles/secretmanager.secretAccessor"</code> and confirm your service account appears.<br>
+      3. If it doesn't appear, re-run the <code>add-iam-policy-binding</code> command from Step B above.</p>
+    </div>
+  </div>
+</div>
+
+<hr>
+
+<!-- ══════════════════════════════════════════════════════════
+     OBJECTIVE 04 — GITHUB ACTIONS CI/CD
+══════════════════════════════════════════════════════════ -->
+<div class="section" id="obj4">
+  <div class="section-head">
+    <div class="s-num c4">04</div>
+    <div class="s-head-text">
+      <h2>PRODUCTION CI/CD — GITHUB ACTIONS</h2>
+      <p>Workload Identity Federation: zero long-lived keys, maximum security, auto-deploy on push</p>
+    </div>
+  </div>
+
+  <div class="why purple">
+    <div class="why-label">↳ Why Workload Identity Federation Instead of Service Account Keys</div>
+    <p>The naive approach: create a service account, download a JSON key file, paste it as a GitHub Secret. The problem: that key file is valid forever, can be leaked, and if compromised gives an attacker permanent access. <strong>Workload Identity Federation</strong> eliminates the key file entirely. Instead, GitHub's OIDC token (a short-lived JWT proving "this is a GitHub Actions run from repo X") is exchanged for a temporary GCP access token that expires in 1 hour. No static credentials. No key rotation headache. This is what Google's own engineers use.</p>
+  </div>
+
+  <!-- PIPELINE DIAGRAM -->
+  <div class="flow">
+    <div class="flow-box fb-purple">
+      <div class="fb-label">Git Push</div>
+      <div class="fb-name">main branch</div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box fb-purple">
+      <div class="fb-label">GitHub OIDC</div>
+      <div class="fb-name">JWT Token</div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box fb-blue">
+      <div class="fb-label">WIF Exchange</div>
+      <div class="fb-name">GCP Token</div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box fb-amber">
+      <div class="fb-label">Build + Push</div>
+      <div class="fb-name">Docker Image</div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box fb-green">
+      <div class="fb-label">Deploy</div>
+      <div class="fb-name">Cloud Run</div>
+    </div>
+  </div>
+
+  <!-- STEP A: Setup WIF -->
+  <h3 style="color:var(--white);font-size:16px;margin-bottom:14px;font-family:var(--mono);letter-spacing:1px;">STEP A — SET UP WORKLOAD IDENTITY FEDERATION</h3>
+  <p style="color:var(--text-dim);font-size:13px;margin-bottom:16px;">Run these commands ONCE. They create the trust relationship between your GitHub repo and GCP.</p>
+
+  <div class="code-wrap">
+    <div class="code-label"><span class="cl-dot cl-p"></span>POWERSHELL — WIF setup (run once, then keep the output values)</div>
+    <pre><span class="cm"># ── Set your variables ──</span>
+$PROJECT_ID    = <span class="st">"your-project-id"</span>
+$PROJECT_NUM   = <span class="st">"123456789012"</span>           <span class="cm"># get from: gcloud projects describe $PROJECT_ID</span>
+$GITHUB_ORG    = <span class="st">"your-github-username"</span>   <span class="cm"># or org name</span>
+$GITHUB_REPO   = <span class="st">"your-repo-name"</span>
+$POOL_ID       = <span class="st">"github-actions-pool"</span>
+$PROVIDER_ID   = <span class="st">"github-actions-provider"</span>
+$SA_NAME       = <span class="st">"project-test-sa"</span>
+$SA_EMAIL      = <span class="st">"$SA_NAME@$PROJECT_ID.iam.gserviceaccount.com"</span>
+
+<span class="cm"># ── 1. Create Workload Identity Pool ──</span>
+gcloud iam workload-identity-pools create $POOL_ID `
+  --project=$PROJECT_ID `
+  --location=global `
+  --display-name=<span class="st">"GitHub Actions Pool"</span>
+
+<span class="cm"># ── 2. Add GitHub as an OIDC provider in the pool ──</span>
+gcloud iam workload-identity-pools providers create-oidc $PROVIDER_ID `
+  --project=$PROJECT_ID `
+  --location=global `
+  --workload-identity-pool=$POOL_ID `
+  --display-name=<span class="st">"GitHub Actions Provider"</span> `
+  --attribute-mapping=<span class="st">"google.subject=assertion.sub,attribute.actor=assertion.actor,attribute.repository=assertion.repository"</span> `
+  --issuer-uri=<span class="st">"https://token.actions.githubusercontent.com"</span>
+
+<span class="cm"># ── 3. Allow GitHub Actions from YOUR repo to impersonate the service account ──</span>
+<span class="cm"># This is the key security control — only THIS specific repo gets access</span>
+gcloud iam service-accounts add-iam-policy-binding $SA_EMAIL `
+  --project=$PROJECT_ID `
+  --role=<span class="st">"roles/iam.workloadIdentityUser"</span> `
+  --member=<span class="st">"principalSet://iam.googleapis.com/projects/$PROJECT_NUM/locations/global/workloadIdentityPools/$POOL_ID/attribute.repository/$GITHUB_ORG/$GITHUB_REPO"</span>
+
+<span class="cm"># ── 4. Grant the service account permission to deploy to Cloud Run ──</span>
+gcloud projects add-iam-policy-binding $PROJECT_ID `
+  --member=<span class="st">"serviceAccount:$SA_EMAIL"</span> `
+  --role=<span class="st">"roles/run.admin"</span>
+
+gcloud projects add-iam-policy-binding $PROJECT_ID `
+  --member=<span class="st">"serviceAccount:$SA_EMAIL"</span> `
+  --role=<span class="st">"roles/artifactregistry.writer"</span>
+
+gcloud projects add-iam-policy-binding $PROJECT_ID `
+  --member=<span class="st">"serviceAccount:$SA_EMAIL"</span> `
+  --role=<span class="st">"roles/iam.serviceAccountUser"</span>
+
+<span class="cm"># ── 5. Get the Workload Identity Provider resource name ──</span>
+<span class="cm"># SAVE THIS OUTPUT — you need it for the GitHub Actions workflow</span>
+gcloud iam workload-identity-pools providers describe $PROVIDER_ID `
+  --project=$PROJECT_ID `
+  --location=global `
+  --workload-identity-pool=$POOL_ID `
+  --format=<span class="st">"value(name)"</span></pre>
+  </div>
+
+  <!-- STEP B: GitHub Secrets -->
+  <h3 style="color:var(--white);font-size:16px;margin:28px 0 14px;font-family:var(--mono);letter-spacing:1px;">STEP B — ADD GITHUB REPOSITORY SECRETS</h3>
+
+  <p style="color:var(--text-dim);font-size:13px;margin-bottom:16px;">Go to your GitHub repo → Settings → Secrets and variables → Actions → New repository secret. Add these three:</p>
+
+  <table>
+    <thead><tr><th>Secret Name</th><th>Value</th><th>Where to Get It</th></tr></thead>
+    <tbody>
+      <tr><td><code>WIF_PROVIDER</code></td><td>Output from step 5 above</td><td>Looks like: <code>projects/123.../providers/github-actions-provider</code></td></tr>
+      <tr><td><code>WIF_SERVICE_ACCOUNT</code></td><td>Your service account email</td><td><code>project-test-sa@YOUR_PROJECT.iam.gserviceaccount.com</code></td></tr>
+      <tr><td><code>GCP_PROJECT_ID</code></td><td>Your GCP project ID</td><td>Output of <code>gcloud config get project</code></td></tr>
+    </tbody>
+  </table>
+
+  <div class="alert alert-info">
+    <span class="alert-icon">ℹ️</span>
+    <div class="alert-body">
+      <strong>Notice: no JSON key file anywhere</strong>
+      <p>Traditional tutorials tell you to download a service account key JSON and paste it as a secret. We're not doing that. The three secrets above contain no credentials — just resource identifiers. The actual authentication happens via GitHub's OIDC token at runtime.</p>
+    </div>
+  </div>
+
+  <!-- STEP C: deploy.yml -->
+  <h3 style="color:var(--white);font-size:16px;margin:28px 0 14px;font-family:var(--mono);letter-spacing:1px;">STEP C — THE COMPLETE deploy.yml</h3>
+  <p style="color:var(--text-dim);font-size:13px;margin-bottom:16px;">Create this file at <code>Project_test/.github/workflows/deploy.yml</code></p>
+
+  <div class="code-wrap">
+    <div class="code-label"><span class="cl-dot cl-p"></span>.github/workflows/deploy.yml — full production pipeline</div>
+    <pre><span class="kw">name</span>: <span class="st">Build and Deploy to Cloud Run</span>
+
+<span class="cm"># ── Trigger: only on pushes to main ──</span>
+<span class="kw">on</span>:
+  <span class="kw">push</span>:
+    <span class="kw">branches</span>:
+      - <span class="st">main</span>
+
+<span class="cm"># ── Permissions required for Workload Identity Federation ──</span>
+<span class="cm"># id-token: write — allows GitHub to issue OIDC token</span>
+<span class="cm"># contents: read — allows checkout of your repository</span>
+<span class="kw">permissions</span>:
+  <span class="kw">contents</span>: <span class="st">read</span>
+  <span class="kw">id-token</span>: <span class="st">write</span>
+
+<span class="kw">env</span>:
+  <span class="kw">REGION</span>:      <span class="st">us-central1</span>
+  <span class="kw">REPO</span>:        <span class="st">project-test-repo</span>
+  <span class="kw">SERVICE</span>:     <span class="st">project-test</span>
+  <span class="kw">IMAGE</span>:       <span class="st">us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/project-test-repo/project-test</span>
+
+<span class="kw">jobs</span>:
+  <span class="kw">deploy</span>:
+    <span class="kw">name</span>: <span class="st">Build, Push, Deploy</span>
+    <span class="kw">runs-on</span>: <span class="st">ubuntu-latest</span>
+
+    <span class="kw">steps</span>:
+
+      <span class="cm"># ── 1. Checkout your code ──</span>
+      - <span class="kw">name</span>: <span class="st">Checkout repository</span>
+        <span class="kw">uses</span>: <span class="st">actions/checkout@v4</span>
+
+      <span class="cm"># ── 2. Authenticate to GCP via Workload Identity Federation ──</span>
+      <span class="cm"># No JSON key. GitHub's OIDC token is exchanged for a GCP token.</span>
+      - <span class="kw">name</span>: <span class="st">Authenticate to Google Cloud</span>
+        <span class="kw">id</span>: <span class="st">auth</span>
+        <span class="kw">uses</span>: <span class="st">google-github-actions/auth@v2</span>
+        <span class="kw">with</span>:
+          <span class="kw">workload_identity_provider</span>: <span class="st">${{ secrets.WIF_PROVIDER }}</span>
+          <span class="kw">service_account</span>:            <span class="st">${{ secrets.WIF_SERVICE_ACCOUNT }}</span>
+
+      <span class="cm"># ── 3. Install gcloud CLI on the runner ──</span>
+      - <span class="kw">name</span>: <span class="st">Set up Cloud SDK</span>
+        <span class="kw">uses</span>: <span class="st">google-github-actions/setup-gcloud@v2</span>
+
+      <span class="cm"># ── 4. Configure Docker to push to Artifact Registry ──</span>
+      - <span class="kw">name</span>: <span class="st">Configure Docker for Artifact Registry</span>
+        <span class="kw">run</span>: <span class="st">gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev --quiet</span>
+
+      <span class="cm"># ── 5. Build the Docker image ──</span>
+      <span class="cm"># Uses GitHub SHA as tag for exact version tracking + "latest"</span>
+      - <span class="kw">name</span>: <span class="st">Build Docker image</span>
+        <span class="kw">run</span>: |
+          <span class="st">docker build \
+            -t ${{ env.IMAGE }}:${{ github.sha }} \
+            -t ${{ env.IMAGE }}:latest \
+            .</span>
+
+      <span class="cm"># ── 6. Push both tags to Artifact Registry ──</span>
+      - <span class="kw">name</span>: <span class="st">Push Docker image</span>
+        <span class="kw">run</span>: |
+          <span class="st">docker push ${{ env.IMAGE }}:${{ github.sha }}
+          docker push ${{ env.IMAGE }}:latest</span>
+
+      <span class="cm"># ── 7. Deploy the new image to Cloud Run ──</span>
+      <span class="cm"># Uses the SHA-tagged image — pinned, not floating "latest"</span>
+      - <span class="kw">name</span>: <span class="st">Deploy to Cloud Run</span>
+        <span class="kw">run</span>: |
+          <span class="st">gcloud run deploy ${{ env.SERVICE }} \
+            --image ${{ env.IMAGE }}:${{ github.sha }} \
+            --region ${{ env.REGION }} \
+            --platform managed \
+            --service-account ${{ secrets.WIF_SERVICE_ACCOUNT }} \
+            --set-env-vars GOOGLE_CLOUD_PROJECT=${{ secrets.GCP_PROJECT_ID }},APP_ENV=production \
+            --memory 512Mi \
+            --cpu 1 \
+            --min-instances 0 \
+            --max-instances 3 \
+            --allow-unauthenticated \
+            --quiet</span>
+
+      <span class="cm"># ── 8. Print the live URL ──</span>
+      - <span class="kw">name</span>: <span class="st">Get Service URL</span>
+        <span class="kw">run</span>: |
+          <span class="st">gcloud run services describe ${{ env.SERVICE }} \
+            --region ${{ env.REGION }} \
+            --format="value(status.url)"</span></pre>
+  </div>
+
+  <!-- WHAT EACH JOB STEP DOES -->
+  <div class="steps">
+    <div class="step">
+      <span class="step-n" style="color:var(--purple);">1</span>
+      <div class="step-body">
+        <strong>actions/checkout@v4</strong>
+        <p>Clones your repository into the runner VM. Without this, subsequent steps have no files to work with.</p>
+      </div>
+    </div>
+    <div class="step">
+      <span class="step-n" style="color:var(--purple);">2</span>
+      <div class="step-body">
+        <strong>google-github-actions/auth@v2 (the WIF handshake)</strong>
+        <p>GitHub creates a signed OIDC token containing your repo name. It sends this to GCP's Security Token Service. GCP verifies the token matches the trusted pool + provider config you set up in Step A. If it matches, GCP issues a short-lived access token. No JSON key ever touched disk.</p>
+      </div>
+    </div>
+    <div class="step">
+      <span class="step-n" style="color:var(--purple);">3–4</span>
+      <div class="step-body">
+        <strong>setup-gcloud + configure-docker</strong>
+        <p>Installs the <code>gcloud</code> CLI on the Ubuntu runner and configures Docker to use GCP credentials when pushing to <code>us-central1-docker.pkg.dev</code>.</p>
+      </div>
+    </div>
+    <div class="step">
+      <span class="step-n" style="color:var(--purple);">5–6</span>
+      <div class="step-body">
+        <strong>Build + Push (dual-tagged)</strong>
+        <p>Builds and pushes two tags: <code>:latest</code> for human reference, <code>:github.sha</code> (e.g. <code>:a3f8c1d</code>) for pinned deployment. Using the SHA tag means Cloud Run always runs the exact commit that triggered the deploy — not a floating "latest" that could be overwritten mid-deploy.</p>
+      </div>
+    </div>
+    <div class="step">
+      <span class="step-n" style="color:var(--purple);">7</span>
+      <div class="step-body">
+        <strong>gcloud run deploy</strong>
+        <p><code>--min-instances 0</code> ensures scale-to-zero (free tier safe). <code>--max-instances 3</code> caps cost. <code>--set-env-vars</code> injects the project ID so your <code>secrets.py</code> module can call Secret Manager. The service account is the same one you granted <code>secretmanager.secretAccessor</code> to.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="alert alert-ok">
+    <span class="alert-icon">✅</span>
+    <div class="alert-body">
+      <strong>Testing the pipeline</strong>
+      <p>Make a trivial change to <code>main.py</code> (update the version string), commit and push to <code>main</code>. Go to your GitHub repo → Actions tab. You'll see the workflow running. Green checkmarks on all 8 steps = successful deploy. The final step prints your live URL.</p>
+    </div>
+  </div>
+
+  <div class="alert alert-danger">
+    <span class="alert-icon">🚫</span>
+    <div class="alert-body">
+      <strong>Common CI/CD Failure: "Permission denied on workload identity"</strong>
+      <p>This means the <code>principalSet</code> member string in Step A doesn't exactly match your repo. Verify: <code>$GITHUB_ORG/$GITHUB_REPO</code> must match the exact case-sensitive GitHub path (e.g. <code>JohnDoe/my-project</code> not <code>johndoe/my-project</code>). Also confirm <code>id-token: write</code> appears in your workflow <code>permissions</code> block — it's required for the OIDC token to be issued.</p>
+    </div>
+  </div>
+</div>
+
+<hr>
+
+<!-- ══════════════════════════════════════════════════════════
+     FULL WORKFLOW SUMMARY
+══════════════════════════════════════════════════════════ -->
+<div class="section">
+  <div class="why cyan">
+    <div class="why-label">⊕ End-to-End Workflow Summary — your daily development loop</div>
+    <p>
+      <strong style="color:var(--white);">Local dev:</strong> Edit <code>main.py</code> → run <code>uvicorn main:app --reload</code> → secrets come from <code>.env</code>.<br><br>
+      <strong style="color:var(--white);">Test it locally in Docker:</strong> <code>docker build -t project-test . && docker run -p 8080:8080 --env-file .env project-test</code> → visit <code>localhost:8080</code>.<br><br>
+      <strong style="color:var(--white);">Deploy to production:</strong> <code>git add . && git commit -m "feat: your change" && git push origin main</code> → GitHub Actions does the rest automatically in ~3 minutes. No manual gcloud commands.
+    </p>
+  </div>
+
+  <table>
+    <thead><tr><th>Phase</th><th>Service</th><th>Free Tier Limit</th><th>Your Usage</th></tr></thead>
+    <tbody>
+      <tr><td>Image Storage</td><td>Artifact Registry</td><td>500 MB/month</td><td class="td-g">~50–100 MB per image</td></tr>
+      <tr><td>Container Runtime</td><td>Cloud Run</td><td>2M req + 360K GB-sec/month</td><td class="td-g">Far under for test traffic</td></tr>
+      <tr><td>Secrets</td><td>Secret Manager</td><td>6 active secrets + 10K ops free</td><td class="td-g">4–5 secrets, minimal ops</td></tr>
+      <tr><td>CI Builds</td><td>Cloud Build</td><td>120 build-minutes/day</td><td class="td-g">~3 min per push</td></tr>
+      <tr><td>WIF Auth</td><td>IAM</td><td>Free</td><td class="td-g">No charge</td></tr>
+    </tbody>
+  </table>
+</div>
+
+</main>
+
+<footer>
+  GCP Cloud Run Deployment Guide &nbsp;·&nbsp; <strong>Agentic AI Hackathon 2026</strong> &nbsp;·&nbsp; Workload Identity Federation · Secret Manager · FastAPI
+</footer>
+
+</body>
+</html>
