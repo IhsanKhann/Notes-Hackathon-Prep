@@ -1,0 +1,101 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="Page-1" id="FKXqDCNuz-bRhQqhgxdO">
+    <mxGraphModel dx="3440" dy="3735" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="BocphrOwTB-a-wmXy_JW-1" parent="1" style="whiteSpace=wrap;html=1;aspect=fixed;" value="Virtual Envoirnment&lt;div&gt;- isolated workspace just like container&amp;nbsp;&lt;/div&gt;&lt;div&gt;- eases up the project setup&lt;/div&gt;&lt;div&gt;- solves the configuration issues, make dependencies local for a specific project&lt;/div&gt;&lt;div&gt;- helps in team collaboration as well&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;span class=&quot;ͼs&quot;&gt;cd&lt;/span&gt; &lt;span class=&quot;ͼt&quot;&gt;Desktop&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;ͼs&quot;&gt;mkdir&lt;/span&gt; &lt;span class=&quot;ͼt&quot;&gt;ai-hackathon&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;ͼs&quot;&gt;cd&lt;/span&gt; &lt;span class=&quot;ͼt&quot;&gt;ai-hackathon&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span class=&quot;ͼt&quot;&gt;&lt;span class=&quot;ͼt&quot;&gt;python&lt;/span&gt; &lt;span class=&quot;ͼn&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;ͼt&quot;&gt;m&lt;/span&gt; &lt;span class=&quot;ͼt&quot;&gt;venv&lt;/span&gt; &lt;span class=&quot;ͼt&quot;&gt;venv&lt;/span&gt;&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span class=&quot;ͼt&quot;&gt;&lt;span class=&quot;ͼt&quot;&gt;&lt;br&gt;&lt;/span&gt;&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span class=&quot;ͼt&quot;&gt;&lt;span class=&quot;ͼt&quot;&gt;This Creates:&lt;/span&gt;&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span class=&quot;ͼt&quot;&gt;&lt;span class=&quot;ͼt&quot;&gt;ai-hackathon/&lt;br&gt;├── venv/&lt;/span&gt;&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span class=&quot;ͼt&quot;&gt;&lt;span class=&quot;ͼt&quot;&gt;&lt;br&gt;&lt;/span&gt;&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span class=&quot;ͼt&quot;&gt;&lt;span class=&quot;ͼt&quot;&gt;Activate the vartiual env:&lt;/span&gt;&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span class=&quot;ͼt&quot;&gt;&lt;span class=&quot;ͼt&quot;&gt;&lt;span class=&quot;ͼt&quot;&gt;venv&lt;/span&gt;\&lt;span class=&quot;ͼt&quot;&gt;Scripts&lt;/span&gt;\&lt;span class=&quot;ͼt&quot;&gt;activate&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span class=&quot;ͼt&quot;&gt;&lt;span class=&quot;ͼt&quot;&gt;&lt;span class=&quot;ͼt&quot;&gt;Insall the Packages:&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span class=&quot;ͼt&quot;&gt;&lt;span class=&quot;ͼt&quot;&gt;&lt;span class=&quot;ͼt&quot;&gt;&lt;span class=&quot;ͼt&quot;&gt;pip&lt;/span&gt; &lt;span class=&quot;ͼt&quot;&gt;install&lt;/span&gt; &lt;span class=&quot;ͼt&quot;&gt;fastapi&lt;/span&gt; &lt;span class=&quot;ͼt&quot;&gt;uvicorn&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span class=&quot;ͼt&quot;&gt;&lt;span class=&quot;ͼt&quot;&gt;&lt;span class=&quot;ͼt&quot;&gt;&lt;span class=&quot;ͼt&quot;&gt;&lt;div class=&quot;pointer-events-none absolute inset-x-4 top-12 bottom-4&quot;&gt;&lt;div class=&quot;pointer-events-none sticky z-40 shrink-0 z-1!&quot;&gt;&lt;div class=&quot;sticky bg-token-border-light&quot;&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class=&quot;relative&quot;&gt;&lt;div class=&quot;&quot;&gt;&lt;div class=&quot;relative z-0 flex max-w-full&quot;&gt;&lt;div id=&quot;code-block-viewer&quot; dir=&quot;ltr&quot; class=&quot;q9tKkq_viewer cm-editor z-10 light:cm-light dark:cm-light flex h-full w-full flex-col items-stretch ͼk ͼy&quot;&gt;&lt;div class=&quot;cm-scroller&quot;&gt;&lt;pre class=&quot;cm-content q9tKkq_readonly m-0&quot;&gt;&lt;code&gt;&lt;span class=&quot;ͼt&quot;&gt;uvicorn&lt;/span&gt; &lt;span class=&quot;ͼt&quot;&gt;main&lt;/span&gt;&lt;span class=&quot;ͼn&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;ͼt&quot;&gt;app&lt;/span&gt; &lt;span class=&quot;ͼn&quot;&gt;--&lt;/span&gt;&lt;span class=&quot;ͼt&quot;&gt;reload&lt;br&gt;deactivate&lt;br&gt;&lt;br&gt;Important for the team collab:&lt;br&gt;&lt;div class=&quot;pointer-events-none absolute inset-x-4 top-12 bottom-4&quot;&gt;&lt;div class=&quot;pointer-events-none sticky z-40 shrink-0 z-1!&quot;&gt;&lt;div class=&quot;sticky bg-token-border-light&quot;&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class=&quot;relative&quot;&gt;&lt;div class=&quot;&quot;&gt;&lt;div class=&quot;relative z-0 flex max-w-full&quot;&gt;&lt;div id=&quot;code-block-viewer&quot; dir=&quot;ltr&quot; class=&quot;q9tKkq_viewer cm-editor z-10 light:cm-light dark:cm-light flex h-full w-full flex-col items-stretch ͼk ͼy&quot;&gt;&lt;div class=&quot;cm-scroller&quot;&gt;&lt;pre class=&quot;cm-content q9tKkq_readonly m-0&quot;&gt;&lt;code&gt;&lt;span class=&quot;ͼt&quot;&gt;pip&lt;/span&gt; &lt;span class=&quot;ͼt&quot;&gt;freeze&lt;/span&gt; &lt;span class=&quot;ͼn&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;ͼt&quot;&gt;requirements&lt;/span&gt;.&lt;span class=&quot;ͼt&quot;&gt;txt&lt;br&gt;&lt;span class=&quot;ͼt&quot;&gt;pip&lt;/span&gt; &lt;span class=&quot;ͼt&quot;&gt;install&lt;/span&gt; &lt;span class=&quot;ͼn&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;ͼs&quot;&gt;r&lt;/span&gt; &lt;span class=&quot;ͼt&quot;&gt;requirements&lt;/span&gt;.&lt;span class=&quot;ͼt&quot;&gt;txt&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="480" width="480" x="820" y="-810" as="geometry" />
+        </mxCell>
+        <mxCell id="BocphrOwTB-a-wmXy_JW-3" edge="1" parent="1" source="BocphrOwTB-a-wmXy_JW-2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="BocphrOwTB-a-wmXy_JW-1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="BocphrOwTB-a-wmXy_JW-2" parent="1" style="whiteSpace=wrap;html=1;aspect=fixed;" value="Setup the Python:&lt;div&gt;- make the sure the following are present&lt;/div&gt;&lt;div&gt;py --version&amp;nbsp;&lt;/div&gt;&lt;div&gt;- usually present in the modren python setups when we setup the python&lt;/div&gt;&lt;div&gt;&lt;br&gt;python --version&lt;/div&gt;&lt;div&gt;pip --version&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;If not properly setup:&lt;/div&gt;&lt;div&gt;go to the settings =&amp;gt; advanced apps settings =&amp;gt; aliases =&amp;gt; turn them off&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;If this dosent work: fix the paths, add them in the user variables =&amp;gt; path&lt;/div&gt;&lt;div&gt;&lt;span class=&quot;ͼt&quot;&gt;py&lt;/span&gt; &lt;span class=&quot;ͼn&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;ͼq&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;ͼt&quot;&gt;p&lt;/span&gt;&lt;/div&gt;&lt;div&gt;(finds you the the location of the python file)&lt;/div&gt;&lt;div&gt;&lt;span class=&quot;ͼt&quot;&gt;&lt;br&gt;&lt;/span&gt;&lt;/div&gt;&lt;div&gt;If properly setup:&lt;/div&gt;&lt;div&gt;py --version&lt;/div&gt;&lt;div&gt;python --version&amp;nbsp;&lt;/div&gt;&lt;div&gt;pip --version should work&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="480" width="480" x="110" y="-810" as="geometry" />
+        </mxCell>
+        <mxCell id="BocphrOwTB-a-wmXy_JW-4" parent="1" style="whiteSpace=wrap;html=1;aspect=fixed;" value="Python&lt;div&gt;- flask&lt;/div&gt;&lt;div&gt;- django&lt;/div&gt;&lt;div&gt;- fastApi&lt;/div&gt;" vertex="1">
+          <mxGeometry height="140" width="140" x="-20" y="-20" as="geometry" />
+        </mxCell>
+        <mxCell id="BocphrOwTB-a-wmXy_JW-5" parent="1" style="whiteSpace=wrap;html=1;aspect=fixed;" value="backend: FastApi&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;- frontend&lt;/div&gt;&lt;div&gt;- postman(tool)&lt;/div&gt;" vertex="1">
+          <mxGeometry height="110" width="110" x="225" y="-20" as="geometry" />
+        </mxCell>
+        <mxCell id="BocphrOwTB-a-wmXy_JW-6" parent="1" style="whiteSpace=wrap;html=1;aspect=fixed;" value="UI =&amp;gt; Frontend: React&lt;div&gt;optional&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="130" width="130" x="215" y="130" as="geometry" />
+        </mxCell>
+        <mxCell id="BocphrOwTB-a-wmXy_JW-10" edge="1" parent="1" source="BocphrOwTB-a-wmXy_JW-7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="619.9999999999998" y="-20" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="BocphrOwTB-a-wmXy_JW-7" parent="1" style="whiteSpace=wrap;html=1;aspect=fixed;" value="- Apis&lt;div&gt;- syntax: variables, functions&lt;/div&gt;&lt;div&gt;- async/await operations&lt;/div&gt;&lt;div&gt;- classes&lt;/div&gt;&lt;div&gt;- pydantic &quot;concept&quot;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="150" width="150" x="430" y="-30" as="geometry" />
+        </mxCell>
+        <mxCell id="BocphrOwTB-a-wmXy_JW-8" edge="1" parent="1" source="BocphrOwTB-a-wmXy_JW-5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=-0.028;entryY=0.435;entryDx=0;entryDy=0;entryPerimeter=0;" target="BocphrOwTB-a-wmXy_JW-7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="BocphrOwTB-a-wmXy_JW-9" parent="1" style="whiteSpace=wrap;html=1;aspect=fixed;" value="Api =&amp;gt; Trigger =&amp;gt; Function(logic)&lt;div&gt;Types:&amp;nbsp;&lt;/div&gt;&lt;div&gt;- get() =&amp;gt; data fetch/get =&amp;gt; NewsApi&amp;nbsp;&lt;/div&gt;&lt;div&gt;CargoApi&lt;/div&gt;&lt;div&gt;TwitterApi&lt;/div&gt;&lt;div&gt;- post =&amp;gt; input =&amp;gt; geminiAPi&amp;nbsp;&lt;/div&gt;&lt;div&gt;- put =&amp;gt; update&lt;/div&gt;&lt;div&gt;- patch =&amp;gt; delete&lt;/div&gt;" vertex="1">
+          <mxGeometry height="260" width="260" x="640" y="-160" as="geometry" />
+        </mxCell>
+        <mxCell id="BocphrOwTB-a-wmXy_JW-11" parent="1" style="whiteSpace=wrap;html=1;aspect=fixed;" value="1- User input =&amp;gt; &quot;prompt&quot;&amp;nbsp;&lt;div&gt;2- backend =&amp;gt; Vertex Api =&amp;gt; Gemini AI API&lt;/div&gt;&lt;div&gt;3- APIs calls&lt;/div&gt;&lt;div&gt;4- Logic execute =&amp;gt; AI &quot;BRAIN&quot; =&amp;gt; decision&lt;/div&gt;&lt;div&gt;5- User output&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;- idea: shipment calculator&lt;/div&gt;&lt;div&gt;&quot;prompt&quot; =&amp;gt; web data =&amp;gt; websites =&amp;gt; web scrapping =&amp;gt; data collect =&amp;gt; news channels =&amp;gt; Brain&amp;nbsp; =&amp;gt; output&amp;nbsp;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="300" width="300" x="210" y="330" as="geometry" />
+        </mxCell>
+        <mxCell id="BocphrOwTB-a-wmXy_JW-12" parent="1" style="whiteSpace=wrap;html=1;aspect=fixed;" value="ihsan pc&lt;div&gt;- fastApi&lt;/div&gt;" vertex="1">
+          <mxGeometry height="240" width="240" x="980" y="-260" as="geometry" />
+        </mxCell>
+        <mxCell id="BocphrOwTB-a-wmXy_JW-13" parent="1" style="whiteSpace=wrap;html=1;aspect=fixed;" value="ali&lt;div&gt;- vertex&amp;nbsp;&lt;/div&gt;&lt;div&gt;- gemini&lt;/div&gt;" vertex="1">
+          <mxGeometry height="240" width="240" x="1260" y="-260" as="geometry" />
+        </mxCell>
+        <mxCell id="BocphrOwTB-a-wmXy_JW-14" parent="1" style="whiteSpace=wrap;html=1;aspect=fixed;" value="reem&lt;div&gt;- cloud&lt;/div&gt;&lt;div&gt;- docker&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="240" width="240" x="1540" y="-260" as="geometry" />
+        </mxCell>
+        <mxCell id="BocphrOwTB-a-wmXy_JW-23" edge="1" parent="1" source="BocphrOwTB-a-wmXy_JW-15" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="BocphrOwTB-a-wmXy_JW-22">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="BocphrOwTB-a-wmXy_JW-24" connectable="0" parent="BocphrOwTB-a-wmXy_JW-23" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="deploy" vertex="1">
+          <mxGeometry relative="1" x="-0.1899" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="BocphrOwTB-a-wmXy_JW-15" parent="1" style="whiteSpace=wrap;html=1;aspect=fixed;" value="github&lt;div&gt;- merge: main =&amp;gt; merge&lt;/div&gt;" vertex="1">
+          <mxGeometry height="150" width="150" x="1290" y="50" as="geometry" />
+        </mxCell>
+        <mxCell id="BocphrOwTB-a-wmXy_JW-16" edge="1" parent="1" source="BocphrOwTB-a-wmXy_JW-12" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.005;entryY=0.59;entryDx=0;entryDy=0;entryPerimeter=0;" target="BocphrOwTB-a-wmXy_JW-15">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="BocphrOwTB-a-wmXy_JW-17" connectable="0" parent="BocphrOwTB-a-wmXy_JW-16" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="ihsan" vertex="1">
+          <mxGeometry relative="1" x="0.1943" y="2" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="BocphrOwTB-a-wmXy_JW-18" edge="1" parent="1" source="BocphrOwTB-a-wmXy_JW-13" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.667;entryY=0.067;entryDx=0;entryDy=0;entryPerimeter=0;" target="BocphrOwTB-a-wmXy_JW-15">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="BocphrOwTB-a-wmXy_JW-19" connectable="0" parent="BocphrOwTB-a-wmXy_JW-18" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="ali" vertex="1">
+          <mxGeometry relative="1" x="0.124" y="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="BocphrOwTB-a-wmXy_JW-20" edge="1" parent="1" source="BocphrOwTB-a-wmXy_JW-14" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.994;entryY=0.6;entryDx=0;entryDy=0;entryPerimeter=0;" target="BocphrOwTB-a-wmXy_JW-15">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="BocphrOwTB-a-wmXy_JW-21" connectable="0" parent="BocphrOwTB-a-wmXy_JW-20" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="reem" vertex="1">
+          <mxGeometry relative="1" x="0.2473" y="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="BocphrOwTB-a-wmXy_JW-22" parent="1" style="whiteSpace=wrap;html=1;aspect=fixed;" value="impressive: cloud =&amp;gt; deploy =&amp;gt; public internet available&lt;div&gt;- google services&amp;nbsp;&lt;/div&gt;&lt;div&gt;- cloud run =&amp;gt; google product =&amp;gt;&amp;nbsp;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;project =&amp;gt; asscoiated billing account =&amp;gt; free version =&amp;gt; pre-paid 10&lt;/div&gt;&lt;div&gt;- billing alerts =&amp;gt; 9 =&amp;gt; email&lt;/div&gt;&lt;div&gt;- 2 =&amp;gt; email&lt;/div&gt;" vertex="1">
+          <mxGeometry height="240" width="240" x="1245" y="320" as="geometry" />
+        </mxCell>
+        <mxCell id="BocphrOwTB-a-wmXy_JW-57" parent="1" style="whiteSpace=wrap;html=1;aspect=fixed;" value="Gemini Api(direct single api) vs Vertex Ai(direct api)&lt;div&gt;- Brain =&amp;gt; &quot;Inference&quot; =&amp;gt; Knowledge Base/Data&lt;/div&gt;&lt;div&gt;- Knowledge base&lt;/div&gt;" vertex="1">
+          <mxGeometry height="320" width="320" x="1230" y="-1990" as="geometry" />
+        </mxCell>
+        <mxCell id="BocphrOwTB-a-wmXy_JW-58" parent="1" style="whiteSpace=wrap;html=1;aspect=fixed;" value="Gemini API&lt;div&gt;- less features&lt;/div&gt;&lt;div&gt;- data =&amp;gt; WEB/interent =&amp;gt; APIS&lt;/div&gt;&lt;div&gt;- monitoring&amp;nbsp;&lt;/div&gt;&lt;div&gt;- development/testing/small projects&lt;/div&gt;&lt;div&gt;- inference =&amp;gt; knowledge base =&amp;gt; apis&amp;nbsp;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="300" width="300" x="1600" y="-2000" as="geometry" />
+        </mxCell>
+        <mxCell id="BocphrOwTB-a-wmXy_JW-59" parent="1" style="whiteSpace=wrap;html=1;aspect=fixed;" value="Vertex AI =&amp;gt; scale&lt;div&gt;- knowledge base + apis/gather data from net&lt;/div&gt;&lt;div&gt;- production =&amp;gt; deploy/net&lt;/div&gt;&lt;div&gt;- RAG: Documents upload: 600 pages =&amp;gt; indexing&lt;/div&gt;&lt;div&gt;- RAG pipeline =&amp;gt; documents upload heavy&amp;nbsp;&lt;/div&gt;&lt;div&gt;- 600 + 600 + 600 =&amp;gt; knowledge base&lt;/div&gt;&lt;div&gt;e.g: Shipment manual =&amp;gt; 500&lt;/div&gt;&lt;div&gt;Trading Routes =&amp;gt; 400&lt;/div&gt;&lt;div&gt;Currency Exchange =&amp;gt; 100&lt;/div&gt;&lt;div&gt;&quot;prompt&quot; =&amp;gt; how much time will it take for my product to ship from harmoz =&amp;gt; output&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="300" width="300" x="1923.41" y="-2000" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
