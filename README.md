@@ -96,7 +96,7 @@ cd YOUR-REPO-NAME
 Open the `.docx` file for your role in Microsoft Word or Google Docs. Read it fully before writing any code.
 
 - 📘 [YouTube: FastAPI Crash Course] (https://youtu.be/tLKKmouUams?si=eOW5XuLPbwBUCwzY)
-- 📘 [YouTube: Google Cloud Run in 5 Minutes] https://youtu.be/foGklduxhM0?si=9xL-XZjyxdsO1Ykz
+- 📘 [YouTube: FastAPi Hindi Course] https://youtu.be/foGklduxhM0?si=9xL-XZjyxdsO1Ykz
 - 📘 [YouTube: GCP course ] https://youtu.be/jpno8FSqpc8?si=cMwiJgkZ27NCvTw7
 - cover only the following areas: 1:08:32 => 1:32:56, 1:38:01 => 3:00:02, 4:20:01 => 5:44:01
 - 📘 [YouTube: Streamlit Tutorial] https://youtu.be/yKTEC1Y5bEQ?si=JY0VlJ-jjXao1pmk
